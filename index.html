@@ -2,258 +2,225 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tính Toán & Tối Ưu Đường Kính Ống Mạng Lưới</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CÔNG CỤ TÍNH THỦY LỰC & CHỌN ĐƯỜNG KÍNH TỐI ƯU</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f7f6; color: #333; }
-        .container { max-width: 900px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .header { background: #1b7a43; color: white; text-align: center; padding: 12px; border-radius: 6px; font-weight: bold; font-size: 1.2rem; }
-        .section { margin-top: 20px; border: 1px solid #e0e0e0; border-radius: 6px; padding: 15px; }
-        .section-title { color: #1b7a43; font-weight: bold; border-bottom: 2px solid #1b7a43; padding-bottom: 5px; margin-bottom: 15px; }
-        .form-group { margin-bottom: 12px; }
-        label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 0.9rem; }
-        input, select { width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
-        .row { display: flex; gap: 15px; }
-        .col { flex: 1; }
-        button { width: 100%; background: #0066cc; color: white; border: none; padding: 12px; font-size: 1rem; font-weight: bold; border-radius: 6px; cursor: pointer; margin-top: 15px; }
-        button:hover { background: #0052a3; }
-        .result-box { background: #eef9f1; border: 1px solid #c2eabd; padding: 15px; border-radius: 6px; margin-top: 15px; }
-        .result-title { font-weight: bold; color: #1b7a43; font-size: 1.1rem; }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; font-size: 0.9rem; }
-        th { background-color: #f2f2f2; }
-        
-        /* Định dạng nổi bật cho các dòng đạt điều kiện */
-        .row-success { 
-            background-color: #e8f5e9 !important;
-            color: #1b5e20 !important;
-            font-weight: bold !important;
+        :root {
+            --primary: #107c41;
+            --primary-dark: #0b552c;
+            --accent: #0070c0;
+            --bg: #f4f7f5;
+            --card-bg: #ffffff;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            --border: #d1d5db;
+            --result-bg: #f0fdf4;
+            --result-border: #bbf7d0;
+            --warn-bg: #fffbeb;
+            --warn-border: #fef08a;
+            --warn-text: #b45309;
         }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: var(--bg); color: var(--text-main); line-height: 1.4; padding: 8px; }
         
-        .text-danger { color: #d32f2f; font-weight: bold; }
-        .text-success { color: #1b5e20; font-weight: bold; }
+        .app-card { max-width: 480px; margin: 0 auto; background: var(--card-bg); border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.06); overflow: hidden; border: 1px solid var(--border); }
+        
+        .app-header { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: #fff; text-align: center; padding: 14px 12px; }
+        .app-header h1 { font-size: 1.05rem; font-weight: 700; letter-spacing: 0.3px; }
+        .app-header p { font-size: 0.78rem; opacity: 0.9; margin-top: 3px; font-weight: 400; }
+
+        .app-body { padding: 12px; }
+
+        .section-label { font-size: 0.8rem; font-weight: 700; color: var(--primary-dark); text-transform: uppercase; background: #eef7ee; padding: 6px 10px; border-radius: 6px; margin: 10px 0 8px 0; border-left: 4px solid var(--primary); }
+
+        .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .full-width { grid-column: span 2; }
+
+        .input-group { display: flex; flex-direction: column; }
+        .input-group label { font-size: 0.78rem; font-weight: 600; color: #374151; margin-bottom: 3px; display: flex; justify-content: space-between; align-items: center; }
+        .unit-tag { font-size: 0.72rem; color: var(--text-muted); font-weight: normal; }
+
+        input, select {
+            width: 100%;
+            height: 42px;
+            padding: 8px 10px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #111827;
+            background-color: #f9fafb;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            outline: none;
+            transition: all 0.15s ease;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--primary);
+            background-color: #fff;
+            box-shadow: 0 0 0 3px rgba(16, 124, 65, 0.15);
+        }
+
+        .btn-submit {
+            width: 100%;
+            height: 46px;
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 700;
+            margin-top: 12px;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0, 112, 192, 0.25);
+        }
+        .btn-submit:active { background: #005a9e; }
+
+        .result-container { margin-top: 12px; background: var(--result-bg); border: 1px solid var(--result-border); border-radius: 10px; padding: 12px; }
+        
+        .result-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px dashed #dcfce7; }
+        .result-row:last-child { border-bottom: none; }
+        
+        .res-title { font-size: 0.83rem; font-weight: 600; color: #166534; }
+        .res-value { font-size: 1rem; font-weight: 800; color: var(--primary-dark); }
+        .highlight-value { font-size: 1.15rem; color: #047857; background: #d1fae5; padding: 2px 8px; border-radius: 6px; }
+
+        .rec-box { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 10px; margin-top: 10px; text-align: center; }
+        .rec-title { font-size: 0.78rem; font-weight: 700; color: #1e40af; text-transform: uppercase; }
+        .rec-value { font-size: 1.25rem; font-weight: 900; color: #1d4ed8; margin-top: 2px; }
+
+        .warn-card { background: var(--warn-bg); border: 1px solid var(--warn-border); color: var(--warn-text); font-size: 0.8rem; padding: 8px 10px; border-radius: 8px; margin-top: 10px; display: none; line-height: 1.3; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="header">TÍNH TOÁN & TỐI ƯU ĐƯỜNG KÍNH ỐNG MẠNG LƯỚI</div>
+<div class="app-card">
+    <div class="app-header">
+        <h1>TÍNH THỦY LỰC & TỐI ƯU ĐƯỜNG KÍNH</h1>
+        <p>Công cụ thiết kế mạng lưới cấp nước trên Mobile</p>
+    </div>
 
-    <div class="section">
-        <div class="form-group">
-            <label for="method">Phương pháp tính toán:</label>
-            <select id="method" onchange="toggleInputs()">
-                <option value="1">Cách 1: Cho trước Lưu lượng Q → Tìm Đường kính D tối ưu (theo v chọn)</option>
-                <option value="2" selected>Cách 2: Cho trước Q, Chênh áp (P1-P2) → Tối ưu D thỏa mãn ΔP & v cho phép</option>
-            </select>
-        </div>
-
-        <div class="section-title">I. THÔNG SỐ THIẾT KẾ ĐẦU VÀO</div>
+    <div class="app-body">
+        <div class="section-label">1. Thông Số Thiết Kế Đầu Vào</div>
         
-        <div class="row">
-            <div class="col form-group">
-                <label for="q_input">Lưu lượng thiết kế Q (m³/h):</label>
-                <input type="number" id="q_input" value="416.666" step="0.001">
+        <div class="input-grid">
+            <div class="input-group">
+                <label>Vận tốc chọn <span class="unit-tag">(m/s)</span></label>
+                <input type="number" id="v_design" value="1.2" step="0.1" max="2.0" inputmode="decimal" oninput="validateV()">
             </div>
-            <div class="col form-group">
-                <label for="length">Chiều dài tuyến L (m):</label>
-                <input type="number" id="length" value="11000">
+            
+            <div class="input-group">
+                <label>Lưu lượng Q <span class="unit-tag">(m³/h)</span></label>
+                <input type="number" id="q_input" value="300" step="10" inputmode="decimal">
             </div>
-        </div>
 
-        <div class="row" id="row_p_inputs">
-            <div class="col form-group">
-                <label for="p1">Áp lực đầu P1 (bar):</label>
-                <input type="number" id="p1" value="4" step="0.1">
+            <div class="input-group">
+                <label>Áp lực P₁ <span class="unit-tag">(bar)</span></label>
+                <input type="number" id="p1" value="3.0" step="0.1" inputmode="decimal">
             </div>
-            <div class="col form-group">
-                <label for="p2">Áp lực cuối P2 (bar):</label>
-                <input type="number" id="p2" value="1.5" step="0.1">
-            </div>
-        </div>
 
-        <div class="row">
-            <div class="col form-group" id="group_v_input">
-                <label for="v_select">Vận tốc kinh tế chọn v (m/s):</label>
-                <input type="number" id="v_select" value="1.5" step="0.1">
+            <div class="input-group">
+                <label>Áp lực P₂ <span class="unit-tag">(bar)</span></label>
+                <input type="number" id="p2" value="2.0" step="0.1" inputmode="decimal">
             </div>
-            <div class="col form-group">
-                <label for="c_val">Vật liệu ống (Hệ số C):</label>
-                <select id="c_val">
-                    <option value="140">Ống nhựa HDPE / uPVC / PPR (C = 140)</option>
-                    <option value="130">Ống gang mới / Ống thép mới (C = 130)</option>
-                    <option value="100">Ống gang cũ / Ống thép cũ (C = 100)</option>
+
+            <div class="input-group full-width">
+                <label>Chiều dài tuyến L <span class="unit-tag">(mét)</span></label>
+                <input type="number" id="length_m" value="1000" step="50" inputmode="decimal">
+            </div>
+
+            <div class="input-group full-width">
+                <label>Vật liệu ống <span class="unit-tag">(Hệ số C)</span></label>
+                <select id="material">
+                    <option value="140" selected>HDPE / PVC / Inox (C = 140)</option>
+                    <option value="130">Gang dẻo mới (C = 130)</option>
+                    <option value="120">Thép mới (C = 120)</option>
+                    <option value="90">Thép cũ / Gang xám (C = 90)</option>
                 </select>
             </div>
         </div>
-    </div>
 
-    <button onclick="calculate()">Tính Toán & Tối Ưu Phương Án</button>
+        <button class="btn-submit" onclick="calculateOptimal()">TÍNH TOÁN & CHỌN ỐNG TỐI ƯU</button>
 
-    <div class="section" id="results_section" style="display:none;">
-        <div class="section-title">II. KẾT QUẢ TÍNH TOÁN & KHẢ NĂNG TẢI</div>
-        <div id="summary_output"></div>
-        <div class="result-box" id="recommendation_box"></div>
-        <table id="details_table">
-            <thead>
-                <tr>
-                    <th>Cỡ Ống (DN)</th>
-                    <th>Đường kính trong (mm)</th>
-                    <th>Vận tốc v (m/s)</th>
-                    <th>Tổn thất Hf (m)</th>
-                    <th>Tổn thất i (m/km)</th>
-                    <th>Đánh giá & Ghi chú</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
+        <div class="section-label">2. Đề Xuất Ống & Kết Quả Thủy Lực</div>
+
+        <div class="rec-box">
+            <div class="rec-title">Đường kính chuẩn khuyên dùng</div>
+            <div class="rec-value" id="rec_d">DN300 (D_tt = 297 mm)</div>
+        </div>
+
+        <div class="result-container">
+            <div class="result-row">
+                <span class="res-title">Tổn thất cột áp (H<sub>f</sub>):</span>
+                <span class="res-value" id="res_hf">10.19 m</span>
+            </div>
+            <div class="result-row">
+                <span class="res-title">Vận tốc thực tế (v<sub>thực</sub>):</span>
+                <span class="res-value highlight-value" id="res_v_actual">1.18 m/s</span>
+            </div>
+            <div class="result-row">
+                <span class="res-title">Lưu lượng ngày đêm (Q<sub>ngđ</sub>):</span>
+                <span class="res-value" id="res_q_day">7.200 m³/ngđ</span>
+            </div>
+            <div class="result-row">
+                <span class="res-title">Tổn thất đơn vị (i = H<sub>f</sub>/L):</span>
+                <span class="res-value" id="res_i">10.19 m/km</span>
+            </div>
+        </div>
+
+        <div class="warn-card" id="warn_msg">
+            ⚠️ <b>Lưu ý:</b> Vận tốc thực tế tiệm cận 2.0 m/s. Nên cân nhắc tăng lên 1 cấp đường kính nếu tuyến ống dài.
+        </div>
     </div>
 </div>
 
 <script>
-// Danh sách ống mẫu (Đã bỏ DN200, DN400, DN500)
-const pipeCatalog = [
-    { dn: "DN250", din: 204.6 },
-    { dn: "DN315", din: 257.8 },
-    { dn: "DN355", din: 290.6 },
-    { dn: "DN450", din: 368.2 },
-    { dn: "DN560", din: 458.4 },
-    { dn: "DN630", din: 515.6 },
-    { dn: "DN710", din: 581.2 },
-    { dn: "DN800", din: 654.8 }
-];
+    const STANDARD_DN = [50, 63, 75, 90, 110, 125, 140, 160, 180, 200, 225, 250, 280, 315, 355, 400, 450, 500, 560, 630, 710, 800, 900, 1000];
 
-function toggleInputs() {
-    const method = document.getElementById("method").value;
-    if (method === "1") {
-        document.getElementById("row_p_inputs").style.display = "none";
-        document.getElementById("group_v_input").style.display = "block";
-    } else {
-        document.getElementById("row_p_inputs").style.display = "flex";
-        document.getElementById("group_v_input").style.display = "none";
+    function validateV() {
+        const vEl = document.getElementById('v_design');
+        if (parseFloat(vEl.value) > 2.0) vEl.value = 2.0;
     }
-}
 
-function calcHf(Q_m3h, Din_mm, L_m, C) {
-    const Q_m3s = Q_m3h / 3600;
-    const D_m = Din_mm / 1000;
-    return 10.67 * L_m * Math.pow(Q_m3s, 1.852) * Math.pow(C, -1.852) * Math.pow(D_m, -4.87);
-}
+    function calculateOptimal() {
+        let vDesign = parseFloat(document.getElementById('v_design').value) || 1.2;
+        const qM3h = parseFloat(document.getElementById('q_input').value) || 0;
+        const p1 = parseFloat(document.getElementById('p1').value) || 0;
+        const p2 = parseFloat(document.getElementById('p2').value) || 0;
+        const L = parseFloat(document.getElementById('length_m').value) || 1;
 
-function calcV(Q_m3h, Din_mm) {
-    const Q_m3s = Q_m3h / 3600;
-    const D_m = Din_mm / 1000;
-    const A = Math.PI * Math.pow(D_m, 2) / 4;
-    return Q_m3s / A;
-}
+        if (vDesign > 2.0) vDesign = 2.0;
+        if (qM3h <= 0 || L <= 0 || p1 < p2) return;
 
-function calculate() {
-    const method = document.getElementById("method").value;
-    const Q = parseFloat(document.getElementById("q_input").value);
-    const L = parseFloat(document.getElementById("length").value);
-    const C = parseFloat(document.getElementById("c_val").value);
-    
-    document.getElementById("results_section").style.display = "block";
-    const tbody = document.querySelector("#details_table tbody");
-    tbody.innerHTML = "";
-    
-    if (method === "1") {
-        const v_select = parseFloat(document.getElementById("v_select").value);
-        const Q_m3s = Q / 3600;
-        const D_calc_mm = Math.sqrt((4 * Q_m3s) / (Math.PI * v_select)) * 1000;
-        
-        document.getElementById("summary_output").innerHTML = 
-            `<p>Đường kính trong lý thuyết: <b>D_trong_tính = ${D_calc_mm.toFixed(1)} mm</b> | Lưu lượng: <b>${Q} m³/h</b></p>`;
-        
-        let recommendedPipe = null;
-        
-        pipeCatalog.forEach(pipe => {
-            const v = calcV(Q, pipe.din);
-            const Hf = calcHf(Q, pipe.din, L, C);
-            const i = Hf / (L / 1000);
-            
-            let status = "Không đạt";
-            let rowClass = "";
-            let statusClass = "text-danger";
-            
-            if (v >= 0.6 && v <= 2.0 && i <= 5.0) {
-                status = "Đạt điều kiện";
-                rowClass = "row-success";
-                statusClass = "text-success";
-                if (!recommendedPipe || Math.abs(v - v_select) < Math.abs(calcV(Q, recommendedPipe.din) - v_select)) {
-                    recommendedPipe = pipe;
-                }
-            }
-            
-            const row = `<tr class="${rowClass}">
-                <td>${pipe.dn}</td>
-                <td>${pipe.din}</td>
-                <td>${v.toFixed(2)}</td>
-                <td>${Hf.toFixed(2)}</td>
-                <td>${i.toFixed(2)}</td>
-                <td class="${statusClass}">${status}</td>
-            </tr>`;
-            tbody.innerHTML += row;
-        });
-        
-        document.getElementById("recommendation_box").innerHTML = 
-            `<div class="result-title">Đề xuất chọn: ${recommendedPipe ? recommendedPipe.dn : "Không có cỡ ống phù hợp"}</div>
-             <p>Lựa chọn dựa trên vận tốc v ≈ ${v_select} m/s và tổn thất đơn vị i ≤ 5.0 m/km.</p>`;
-             
-    } else {
-        const p1 = parseFloat(document.getElementById("p1").value);
-        const p2 = parseFloat(document.getElementById("p2").value);
-        const deltaP_bar = p1 - p2;
-        const deltaP_m = deltaP_bar * 10.197;
-        const i_allow = deltaP_m / (L / 1000);
-        
-        document.getElementById("summary_output").innerHTML = 
-            `<p>Chênh áp cho phép: <b>ΔP = ${deltaP_bar.toFixed(2)} bar (${deltaP_m.toFixed(2)} m H₂O)</b> | Độ dốc thủy lực giới hạn: <b>i_cp = ${i_allow.toFixed(2)} m/km</b></p>`;
-            
-        let optimalPipe = null;
-        
-        pipeCatalog.forEach(pipe => {
-            const v = calcV(Q, pipe.din);
-            const Hf = calcHf(Q, pipe.din, L, C);
-            const i = Hf / (L / 1000);
-            
-            let isPass = (Hf <= deltaP_m) && (v >= 0.6 && v <= 2.0);
-            let note = "";
-            let rowClass = "";
-            
-            if (Hf > deltaP_m) {
-                note = "Không đạt (Vượt quá ΔP cho phép)";
-            } else if (v < 0.6) {
-                note = "Cảnh báo (Vận tốc quá nhỏ < 0.6m/s)";
-            } else if (v > 2.0) {
-                note = "Không đạt (Vận tốc quá cao > 2.0m/s)";
-            } else {
-                note = "Đạt điều kiện";
-                rowClass = "row-success";
-                if (!optimalPipe) {
-                    optimalPipe = pipe;
-                }
-            }
-            
-            const row = `<tr class="${rowClass}">
-                <td>${pipe.dn}</td>
-                <td>${pipe.din}</td>
-                <td>${v.toFixed(2)}</td>
-                <td>${Hf.toFixed(2)}</td>
-                <td>${i.toFixed(2)}</td>
-                <td class="${isPass ? 'text-success' : 'text-danger'}">${note}</td>
-            </tr>`;
-            tbody.innerHTML += row;
-        });
-        
-        document.getElementById("recommendation_box").innerHTML = 
-            `<div class="result-title">Đề xuất tối ưu: ${optimalPipe ? optimalPipe.dn + ' (Din = ' + optimalPipe.din + ' mm)' : "Cần tăng cỡ ống thêm"}</div>
-             <p>Đây là đường kính nhỏ nhất đảm bảo tổn thất áp lực Hf ≤ ${deltaP_m.toFixed(2)} m (${deltaP_bar} bar) và vận tốc chảy nằm trong khoảng an toàn 0.6 - 2.0 m/s.</p>`;
+        // 1. Tính D lý thuyết (mm)
+        const qM3s = qM3h / 3600.0;
+        const areaCalc = qM3s / vDesign;
+        const dTheoreticalMm = Math.sqrt((4 * areaCalc) / Math.PI) * 1000.0;
+
+        // 2. Tra cấp đường kính DN tiêu chuẩn >= D_lý thuyết
+        let matchedDN = STANDARD_DN.find(dn => dn >= dTheoreticalMm) || Math.round(dTheoreticalMm);
+
+        // 3. Vận tốc thực tế trong ống DN đã chọn
+        const dRealM = matchedDN / 1000.0;
+        const areaReal = (Math.PI * Math.pow(dRealM, 2)) / 4.0;
+        const vActual = qM3s / areaReal;
+
+        // 4. Tổn thất cột áp
+        const hf = ((p1 - p2) * 100000) / 9810.0;
+        const iMPerKm = (hf / L) * 1000.0;
+
+        // 5. Cập nhật UI
+        document.getElementById('rec_d').innerText = "DN" + matchedDN + " (D_lý thuyết = " + dTheoreticalMm.toFixed(1) + " mm)";
+        document.getElementById('res_hf').innerText = hf.toFixed(2) + " m";
+        document.getElementById('res_v_actual').innerText = vActual.toFixed(2) + " m/s";
+        document.getElementById('res_q_day').innerText = Math.round(qM3h * 24).toLocaleString('vi-VN') + " m³/ngđ";
+        document.getElementById('res_i').innerText = iMPerKm.toFixed(2) + " m/km";
+
+        const warnEl = document.getElementById('warn_msg');
+        warnEl.style.display = (vActual > 1.8) ? 'block' : 'none';
     }
-}
 
-toggleInputs();
+    window.onload = calculateOptimal;
 </script>
-
 </body>
 </html>
