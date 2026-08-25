@@ -65,7 +65,7 @@
         <!-- TRƯỜNG HỢP 1 -->
         <div id="mode1">
             <div class="mode-desc">
-                📌 <b>Trường hợp 1:</b> Tự động tính ra <b>Vận tốc thực tế (v)</b> dựa trên độ sụt áp (P1 - P2) và chiều dài (L). Cảnh báo nếu vận tốc v > 2.0 ( m/s).
+                📌 <b>Trường hợp 1:</b> Tự động tính ra <b>Vận tốc thực tế ($v$)</b> dựa trên độ sụt áp ($P_1 - P_2$) và chiều dài ($L$). Cảnh báo nếu vận tốc $v > 2.0 \text{ m/s}$.
             </div>
             <div class="section-title">I. Thông Số Đầu Vào</div>
             <div class="form-grid">
@@ -78,21 +78,23 @@
                     <input type="number" id="m1_p2" value="2.0" step="0.1" inputmode="decimal">
                 </div>
                 <div class="form-group">
-                    <label>Đường kính D (mm):</label>
-                    <input type="number" id="m1_d" value="400" step="1" inputmode="decimal">
+                    <label>Vật liệu ống:</label>
+                    <select id="m1_mat" onchange="updateDiameters('m1')">
+                        <option value="hdpe" data-c="140" selected>Ống HDPE (C = 140)</option>
+                        <option value="pvc" data-c="140">Ống uPVC (C = 140)</option>
+                        <option value="inox" data-c="140">Ống Inox (C = 140)</option>
+                        <option value="ductile" data-c="130">Ống Gang dẻo (C = 130)</option>
+                        <option value="steel_new" data-c="120">Ống Thép mới (C = 120)</option>
+                        <option value="steel_old" data-c="90">Thép cũ / Gang xám (C = 90)</option>
+                    </select>
                 </div>
                 <div class="form-group">
-                    <label>Chiều dài ống L (m):</label>
-                    <input type="number" id="m1_l" value="1000" step="10" inputmode="decimal">
+                    <label>Đường kính D (mm):</label>
+                    <select id="m1_d"></select>
                 </div>
                 <div class="form-group" style="grid-column: 1 / -1;">
-                    <label>Vật liệu ống (Hệ số C):</label>
-                    <select id="m1_mat">
-                        <option value="140" selected>HDPE / PVC / Inox (C = 140)</option>
-                        <option value="130">Gang dẻo mới (C = 130)</option>
-                        <option value="120">Thép mới (C = 120)</option>
-                        <option value="90">Thép cũ / Gang xám (C = 90)</option>
-                    </select>
+                    <label>Chiều dài ống L (m):</label>
+                    <input type="number" id="m1_l" value="1000" step="10" inputmode="decimal">
                 </div>
             </div>
 
@@ -126,8 +128,19 @@
                     <input type="number" id="m2_p2" value="2.0" step="0.1" inputmode="decimal">
                 </div>
                 <div class="form-group">
+                    <label>Vật liệu ống:</label>
+                    <select id="m2_mat" onchange="updateDiameters('m2')">
+                        <option value="hdpe" data-c="140" selected>Ống HDPE (C = 140)</option>
+                        <option value="pvc" data-c="140">Ống uPVC (C = 140)</option>
+                        <option value="inox" data-c="140">Ống Inox (C = 140)</option>
+                        <option value="ductile" data-c="130">Ống Gang dẻo (C = 130)</option>
+                        <option value="steel_new" data-c="120">Ống Thép mới (C = 120)</option>
+                        <option value="steel_old" data-c="90">Thép cũ / Gang xám (C = 90)</option>
+                    </select>
+                </div>
+                <div class="form-group">
                     <label>Đường kính D (mm):</label>
-                    <input type="number" id="m2_d" value="400" step="1" inputmode="decimal">
+                    <select id="m2_d"></select>
                 </div>
                 <div class="form-group">
                     <label>Chiều dài ống L (m):</label>
@@ -136,15 +149,6 @@
                 <div class="form-group">
                     <label>Vận tốc chọn v (m/s) [≤ 2.0]:</label>
                     <input type="number" id="m2_v" value="1.5" step="0.1" max="2.0" inputmode="decimal" oninput="limitV2()">
-                </div>
-                <div class="form-group">
-                    <label>Vật liệu ống (Hệ số C):</label>
-                    <select id="m2_mat">
-                        <option value="140" selected>HDPE / PVC / Inox (C = 140)</option>
-                        <option value="130">Gang dẻo mới (C = 130)</option>
-                        <option value="120">Thép mới (C = 120)</option>
-                        <option value="90">Thép cũ (C = 90)</option>
-                    </select>
                 </div>
             </div>
 
@@ -165,6 +169,40 @@
 </div>
 
 <script>
+    // Danh mục đường kính chuẩn theo vật liệu
+    const diameterOptions = {
+        hdpe: [16, 20, 25, 32, 40, 50, 63, 75, 90, 110, 125, 140, 160, 180, 200, 225, 250, 280, 315, 355, 400, 450, 500, 560, 630, 710, 800, 900, 1000, 1200],
+        pvc: [21, 27, 34, 42, 49, 60, 75, 90, 110, 140, 160, 200, 225, 250, 280, 315, 355, 400, 450, 500],
+        inox: [15, 20, 25, 32, 40, 50, 65, 80, 100, 125, 150, 200, 250, 300, 350, 400, 450, 500],
+        ductile: [80, 100, 150, 200, 250, 300, 350, 400, 450, 500, 600, 700, 800, 900, 1000, 1200],
+        steel_new: [15, 20, 25, 32, 40, 50, 65, 80, 100, 125, 150, 200, 250, 300, 350, 400, 450, 500, 600, 700, 800],
+        steel_old: [15, 20, 25, 32, 40, 50, 65, 80, 100, 125, 150, 200, 250, 300, 350, 400, 450, 500, 600, 700, 800]
+    };
+
+    function updateDiameters(prefix) {
+        const matSelect = document.getElementById(prefix + '_mat');
+        const dSelect = document.getElementById(prefix + '_d');
+        const selectedMat = matSelect.value;
+        const list = diameterOptions[selectedMat] || [];
+
+        const currentVal = dSelect.value;
+        dSelect.innerHTML = '';
+        list.forEach(d => {
+            const opt = document.createElement('option');
+            opt.value = d;
+            opt.textContent = `DN${d} (Ø${d} mm)`;
+            dSelect.appendChild(opt);
+        });
+
+        if (list.includes(parseFloat(currentVal))) {
+            dSelect.value = currentVal;
+        } else if (list.includes(400)) {
+            dSelect.value = 400;
+        } else {
+            dSelect.selectedIndex = Math.floor(list.length / 2);
+        }
+    }
+
     function switchMode(mode) {
         document.getElementById('mode1').style.display = (mode === 'mode1') ? 'block' : 'none';
         document.getElementById('mode2').style.display = (mode === 'mode2') ? 'block' : 'none';
@@ -184,7 +222,9 @@
         const p2 = parseFloat(document.getElementById('m1_p2').value) || 0;
         const dMm = parseFloat(document.getElementById('m1_d').value) || 0;
         const L = parseFloat(document.getElementById('m1_l').value) || 0;
-        const C = parseFloat(document.getElementById('m1_mat').value) || 140;
+        
+        const matSelect = document.getElementById('m1_mat');
+        const C = parseFloat(matSelect.options[matSelect.selectedIndex].getAttribute('data-c')) || 140;
 
         if (dMm <= 0 || L <= 0 || p1 < p2) return;
 
@@ -213,7 +253,9 @@
         const dMm = parseFloat(document.getElementById('m2_d').value) || 0;
         const L = parseFloat(document.getElementById('m2_l').value) || 0;
         let vInput = parseFloat(document.getElementById('m2_v').value) || 0;
-        const C = parseFloat(document.getElementById('m2_mat').value) || 140;
+        
+        const matSelect = document.getElementById('m2_mat');
+        const C = parseFloat(matSelect.options[matSelect.selectedIndex].getAttribute('data-c')) || 140;
 
         if (vInput > 2.0) vInput = 2.0;
         if (dMm <= 0 || L <= 0 || p1 < p2) return;
@@ -239,7 +281,11 @@
         }
     }
 
-    window.onload = calcMode1;
+    window.onload = function() {
+        updateDiameters('m1');
+        updateDiameters('m2');
+        calcMode1();
+    };
 </script>
 </body>
 </html>
