@@ -124,7 +124,7 @@
         <!-- TRƯỜNG HỢP 2 -->
         <div id="mode2" style="display: none;">
             <div class="mode-desc">
-                📌 <b>Trường hợp 2:</b> Nhập <b>Vận tốc đề xuất ($v$)</b> để tính Lưu lượng ($Q$) và Chiều dài tối đa ($L_{max}$). Cảnh báo nếu $v$ vượt dải kinh tế của cấp đường kính.
+                📌 <b>Trường hợp 2:</b> Nhập <b>Vận tốc đề xuất (v)</b> để tính Lưu lượng (Q) và Chiều dài tối đa (L_{max}). Cảnh báo nếu v vượt dải kinh tế của cấp đường kính.
             </div>
             <div class="section-title">I. Thông Số Đầu Vào</div>
             <div class="form-grid">
@@ -190,15 +190,15 @@
      */
     function getEconVelocityRules(dMm) {
         if (dMm < 150) {
-            return { grade: "Cấp III", role: "Ống nhánh / Ống dịch vụ", min: 0.6, max: 1.0 };
+            return { grade: "Cấp III", role: "Ống dịch vụ", min: 0.6, max: 1.0 };
         } else if (dMm < 300) {
-            return { grade: "Cấp II", role: "Ống phân phối khu vực", min: 0.9, max: 1.2 };
+            return { grade: "Cấp II", role: "Ống phân phối", min: 0.9, max: 1.2 };
         } else if (dMm <= 500) {
             return { grade: "Cấp I", role: "Ống truyền dẫn chính", min: 1.1, max: 1.4 };
         } else if (dMm <= 800) {
             return { grade: "Tuyến ống truyền tải", role: "Trục truyền tải đô thị", min: 1.3, max: 1.6 };
         } else {
-            return { grade: "Tuyến ống truyền tải", role: "Tuyến đại truyền tải", min: 1.5, max: 1.8 };
+            return { grade: "Tuyến ống truyền tải", role: "Trục truyền tải đô thị", min: 1.5, max: 1.8 };
         }
     }
 
