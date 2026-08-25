@@ -16,18 +16,19 @@
             --btn-blue: #0070c0;
             --result-bg: #eef7ee;
             
-            /* Dải màu cảnh báo */
+            /* Màu định dạng chữ trong Warning Box */
+            --text-blue: #0070c0;
+            --text-red: #d9534f;
+
+            /* Dải màu nền cảnh báo */
             --warn-red-bg: #f8d7da;
             --warn-red-border: #f5c6cb;
-            --warn-red-text: #721c24;
 
             --warn-yellow-bg: #fff3cd;
             --warn-yellow-border: #ffeba2;
-            --warn-yellow-text: #856404;
 
             --warn-green-bg: #d4edda;
             --warn-green-border: #c3e6cb;
-            --warn-green-text: #155724;
 
             --tab-active: #107c41;
             --tab-inactive: #d9d9d9;
@@ -60,6 +61,10 @@
         
         .warning-box { padding: 8px 12px; border-radius: 4px; font-size: 0.82rem; margin-top: 8px; font-weight: 500; line-height: 1.45; }
         .mode-desc { font-size: 0.83rem; color: #444; background: #f5f5f5; padding: 8px 10px; border-radius: 4px; border-left: 3px solid var(--btn-blue); margin-bottom: 10px; line-height: 1.35; }
+
+        /* Style phân màu từng dòng thông báo */
+        .info-blue { color: var(--text-blue); }
+        .alert-red { color: var(--text-red); }
     </style>
 </head>
 <body>
@@ -237,24 +242,24 @@
 
     function renderWarningBox(boxId, vVal, rule, dMm, isTheory = false) {
         const box = document.getElementById(boxId);
-        let html = `<b>Cấp ống:</b> ${rule.grade} - ${rule.role} (DN${dMm})<br>`;
-        html += `<b>Vận tốc kinh tế tiêu chuẩn (v<sub>kt</sub>):</b> ${rule.min} - ${rule.max} m/s<br>`;
 
+        // 2 dòng đầu màu Xanh Blue
+        let html = `<div class="info-blue"><b>Cấp ống:</b> ${rule.grade} - ${rule.role} (DN${dMm})</div>`;
+        html += `<div class="info-blue"><b>Vận tốc kinh tế tiêu chuẩn (v<sub>kt</sub>):</b> ${rule.min} - ${rule.max} m/s</div>`;
+
+        // Dòng cảnh báo bên dưới
         if (vVal < rule.min) {
             box.style.backgroundColor = 'var(--warn-yellow-bg)';
             box.style.borderColor = 'var(--warn-yellow-border)';
-            box.style.color = 'var(--warn-yellow-text)';
-            html += `⚠️ <b>Đánh giá:</b> Vận tốc ${isTheory ? 'tự nhiên' : 'thiết kế'} <b>${vVal.toFixed(2)} m/s</b> nhỏ hơn dải kinh tế. Nguy cơ đọng cặn, chưa tối ưu chi phí đầu tư.`;
+            html += `<div class="alert-red">⚠️ <b>Đánh giá:</b> Vận tốc ${isTheory ? 'tự nhiên' : 'thiết kế'} <b>${vVal.toFixed(2)} m/s</b> nhỏ hơn dải kinh tế. Nguy cơ đọng cặn, chưa tối ưu chi phí đầu tư.</div>`;
         } else if (vVal > rule.max) {
             box.style.backgroundColor = 'var(--warn-red-bg)';
             box.style.borderColor = 'var(--warn-red-border)';
-            box.style.color = 'var(--warn-red-text)';
-            html += `🚫 <b>Cảnh báo:</b> Vận tốc ${isTheory ? 'tự nhiên' : 'thiết kế'} <b>${vVal.toFixed(2)} m/s</b> vượt quá ngưỡng kinh tế (${rule.max} m/s). Nguy cơ tổn thất áp lực cao, xói mòn / búa nước và tăng chi phí điện bơm.`;
+            html += `<div class="alert-red">🚫 <b>Cảnh báo:</b> Vận tốc ${isTheory ? 'tự nhiên' : 'thiết kế'} <b>${vVal.toFixed(2)} m/s</b> vượt quá ngưỡng kinh tế (${rule.max} m/s). Nguy cơ gây tổn thất áp lực cao trong đường ống / búa nước và tăng chi phí điện năng.</div>`;
         } else {
             box.style.backgroundColor = 'var(--warn-green-bg)';
             box.style.borderColor = 'var(--warn-green-border)';
-            box.style.color = 'var(--warn-green-text)';
-            html += `✅ <b>Đánh giá:</b> Vận tốc <b>${vVal.toFixed(2)} m/s</b> nằm trong dải kinh tế tối ưu. Hệ thống đạt hiệu quả cao nhất!`;
+            html += `<div class="alert-red">✅ <b>Đánh giá:</b> Vận tốc <b>${vVal.toFixed(2)} m/s</b> nằm trong dải kinh tế tối ưu. Hệ thống đạt hiệu quả cao nhất!</div>`;
         }
 
         box.innerHTML = html;
