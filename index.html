@@ -65,7 +65,7 @@
         <!-- TRƯỜNG HỢP 1 -->
         <div id="mode1">
             <div class="mode-desc">
-                📌 <b>Trường hợp 1:</b> Tự động tính ra <b>Vận tốc thực tế (v)</b> dựa trên độ sụt áp (P1 - P2) và chiều dài (L). Cảnh báo nếu vận tốc v > 2.0 m/s.
+                📌 <b>Trường hợp 1:</b> Tự động tính ra <b>Vận tốc thực tế ($v$)</b> dựa trên độ sụt áp ($P_1 - P_2$) và chiều dài ($L$). Cảnh báo nếu vận tốc $v > 2.0 \text{ m/s}$.
             </div>
             <div class="section-title">I. Thông Số Đầu Vào</div>
             <div class="form-grid">
@@ -90,7 +90,7 @@
                 </div>
                 <div class="form-group">
                     <label>Đường kính D (mm):</label>
-                    <select id="m1_d"></select>
+                    <select id="m1_d" onchange="calcMode1()"></select>
                 </div>
                 <div class="form-group" style="grid-column: 1 / -1;">
                     <label>Chiều dài ống L (m):</label>
@@ -115,7 +115,7 @@
         <!-- TRƯỜNG HỢP 2 -->
         <div id="mode2" style="display: none;">
             <div class="mode-desc">
-                📌 <b>Trường hợp 2:</b> Nhập sẵn <b>Vận tốc đề xuất (v \le 2.0 m/s)</b>. Hệ thống tính ngay Lưu lượng (Q) và Chiều dài ống tối đa (L_max) đạt vận tốc đó.
+                📌 <b>Trường hợp 2:</b> Nhập sẵn <b>Vận tốc đề xuất ($v \le 2.0 \text{ m/s}$)</b>. Hệ thống tính ngay Lưu lượng ($Q$) và Chiều dài ống tối đa ($L_{max}$) đạt vận tốc đó.
             </div>
             <div class="section-title">I. Thông Số Đầu Vào</div>
             <div class="form-grid">
@@ -140,15 +140,15 @@
                 </div>
                 <div class="form-group">
                     <label>Đường kính D (mm):</label>
-                    <select id="m2_d"></select>
+                    <select id="m2_d" onchange="calcMode2()"></select>
                 </div>
                 <div class="form-group">
                     <label>Chiều dài ống L (m):</label>
-                    <input type="number" id="m2_l" value="1000" step="10" inputmode="decimal">
+                    <input type="number" id="m2_l" value="500" step="10" inputmode="decimal">
                 </div>
                 <div class="form-group">
                     <label>Vận tốc chọn v (m/s) [≤ 2.0]:</label>
-                    <input type="number" id="m2_v" value="1.5" step="0.1" max="2.0" inputmode="decimal" oninput="limitV2()">
+                    <input type="number" id="m2_v" value="1.0" step="0.1" max="2.0" inputmode="decimal" oninput="limitV2()">
                 </div>
             </div>
 
@@ -169,9 +169,9 @@
 </div>
 
 <script>
-    // Danh mục đường kính chuẩn theo vật liệu
+    // Danh mục đường kính chuẩn theo vật liệu (Đã loại bỏ 180, 200, 400, 500 khỏi HDPE)
     const diameterOptions = {
-        hdpe: [16, 20, 25, 32, 40, 50, 63, 75, 90, 110, 125, 140, 160, 180, 200, 225, 250, 280, 315, 355, 400, 450, 500, 560, 630, 710, 800, 900, 1000, 1200],
+        hdpe: [16, 20, 25, 32, 40, 50, 63, 75, 90, 110, 125, 140, 160, 225, 250, 280, 315, 355, 450, 560, 630, 710, 800, 900, 1000, 1200],
         pvc: [21, 27, 34, 42, 49, 60, 75, 90, 110, 140, 160, 200, 225, 250, 280, 315, 355, 400, 450, 500],
         inox: [15, 20, 25, 32, 40, 50, 65, 80, 100, 125, 150, 200, 250, 300, 350, 400, 450, 500],
         ductile: [80, 100, 150, 200, 250, 300, 350, 400, 450, 500, 600, 700, 800, 900, 1000, 1200],
@@ -185,7 +185,7 @@
         const selectedMat = matSelect.value;
         const list = diameterOptions[selectedMat] || [];
 
-        const currentVal = dSelect.value;
+        const currentVal = parseFloat(dSelect.value);
         dSelect.innerHTML = '';
         list.forEach(d => {
             const opt = document.createElement('option');
@@ -194,13 +194,16 @@
             dSelect.appendChild(opt);
         });
 
-        if (list.includes(parseFloat(currentVal))) {
+        if (list.includes(currentVal)) {
             dSelect.value = currentVal;
-        } else if (list.includes(400)) {
-            dSelect.value = 400;
+        } else if (list.includes(450)) {
+            dSelect.value = 450;
         } else {
             dSelect.selectedIndex = Math.floor(list.length / 2);
         }
+
+        if (prefix === 'm1') calcMode1();
+        else calcMode2();
     }
 
     function switchMode(mode) {
