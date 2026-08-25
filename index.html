@@ -55,7 +55,7 @@
         .pa1 .pa-header { color: var(--excel-green-dark); }
         .pa2 .pa-header { color: #9a3412; }
 
-        .pa-dn { font-size: 1.4rem; font-weight: bold; margin-bottom: 8px; }
+        .pa-dn { font-size: 1.3rem; font-weight: bold; margin-bottom: 8px; }
         .pa1 .pa-dn { color: #000; }
         .pa2 .pa-dn { color: #7c2d12; }
 
@@ -115,8 +115,18 @@
                 <input type="number" id="i_max" value="5.0" step="0.1" min="0.5">
             </div>
             <div class="form-group">
+                <label for="pn_select">Cấp áp lực HDPE (SDR):</label>
+                <select id="pn_select" onchange="calculatePipe()">
+                    <option value="17">PN6 (SDR17 - Thành mỏng)</option>
+                    <option value="13.6">PN8 (SDR13.6)</option>
+                    <option value="11" selected>PN10 (SDR11 - Tiêu chuẩn)</option>
+                    <option value="9">PN12.5 (SDR9)</option>
+                    <option value="7.4">PN16 (SDR7.4 - Thành dày)</option>
+                </select>
+            </div>
+            <div class="form-group full-width">
                 <label for="material">Vật liệu ống (Hệ số C):</label>
-                <select id="material" onchange="calculatePipe()">
+                <select id="material" onchange="togglePnVisibility(); calculatePipe();">
                     <option value="hdpe" selected>Ống nhựa HDPE / uPVC / PPR (C = 140)</option>
                     <option value="ductile">Gang dẻo mới (C = 130)</option>
                     <option value="ductile_old">Gang dẻo cũ (C = 110)</option>
@@ -131,7 +141,7 @@
         <div class="section-title">II. BẢNG SO SÁNH & TỐI ƯU ĐƯỜNG KÍNH</div>
         
         <div class="calc-info-box">
-            Đường kính tính theo vận tốc: <b>D<sub>tính</sub> = <span id="res_d_calc">313.4</span> mm</b> | 
+            Đường kính trong lý thuyết: <b>D<sub>trong_tính</sub> = <span id="res_d_calc">313.4</span> mm</b> | 
             Lưu lượng: <b id="res_qh">416.67 m³/h</b> (<span id="res_qday">10.000 m³/ngđ</span>)
         </div>
 
@@ -139,23 +149,23 @@
             <!-- PHƯƠNG ÁN TÍNH THEO VẬN TỐC -->
             <div class="pa-card pa2">
                 <div class="pa-header">PA THUẦN VẬN TỐC (Chọn theo v)</div>
-                <div class="pa-dn" id="pa_v_dn">DN315 (315 mm)</div>
+                <div class="pa-dn" id="pa_v_dn">DN355 (Dtrong = 290.4 mm)</div>
                 <ul class="pa-details">
-                    <li><span>Vận tốc thực tế (v):</span> <b id="pa_v_v">1.49 m/s</b></li>
-                    <li><span>Tổn thất cột áp (H<sub>f</sub>):</span> <b id="pa_v_hf">108.11 m</b></li>
-                    <li><span>Tổn thất đơn vị (i):</span> <b id="pa_v_i">5.77 m/km</b></li>
-                    <li><span>Đánh giá $i \le i_{max}$:</span> <span id="pa_v_status" class="warn-text">Vượt giới hạn (> 5 m/km)</span></li>
+                    <li><span>Vận tốc thực tế (v):</span> <b id="pa_v_v">1.75 m/s</b></li>
+                    <li><span>Tổn thất cột áp (H<sub>f</sub>):</span> <b id="pa_v_hf">148.65 m</b></li>
+                    <li><span>Tổn thất đơn vị (i):</span> <b id="pa_v_i">7.93 m/km</b></li>
+                    <li><span>Đánh giá i ≤ i<sub>max</sub>:</span> <span id="pa_v_status" class="warn-text">Vượt giới hạn (> 5 m/km)</span></li>
                 </ul>
             </div>
 
             <!-- PHƯƠNG ÁN TỐI ƯU CẢ V VÀ HF -->
             <div class="pa-card pa1">
-                <div class="pa-header">PA TỐI ƯU HÓA (Đạt cả v & i)</div>
-                <div class="pa-dn" id="pa_opt_dn">DN355 (355 mm)</div>
+                <div class="pa-header">PA TỐI ƯU TỔNG THỂ (Đạt v & i)</div>
+                <div class="pa-dn" id="pa_opt_dn">DN400 (Dtrong = 327.2 mm)</div>
                 <ul class="pa-details">
-                    <li><span>Vận tốc thực tế (v):</span> <b id="pa_opt_v">1.17 m/s</b></li>
-                    <li><span>Tổn thất cột áp (H<sub>f</sub>):</span> <b id="pa_opt_hf">58.60 m</b></li>
-                    <li><span>Tổn thất đơn vị (i):</span> <b id="pa_opt_i">3.13 m/km</b></li>
+                    <li><span>Vận tốc thực tế (v):</span> <b id="pa_opt_v">1.37 m/s</b></li>
+                    <li><span>Tổn thất cột áp (H<sub>f</sub>):</span> <b id="pa_opt_hf">87.52 m</b></li>
+                    <li><span>Tổn thất đơn vị (i):</span> <b id="pa_opt_i">4.67 m/km</b></li>
                     <li><span>Đánh giá tổng thể:</span> <span id="pa_opt_status" class="ok-text">Tối ưu (i ≤ 5 m/km)</span></li>
                 </ul>
             </div>
@@ -194,13 +204,33 @@
         calculatePipe();
     }
 
-    function getPADetails(dn, Q_m3s, L, C) {
-        const D_m = dn / 1000.0;
+    function togglePnVisibility() {
+        const matKey = document.getElementById('material').value;
+        const pnGroup = document.getElementById('pn_select').parentElement;
+        if (matKey === 'hdpe') {
+            pnGroup.style.display = 'flex';
+        } else {
+            pnGroup.style.display = 'none';
+        }
+    }
+
+    function getDIn(dn, matKey) {
+        if (matKey === 'hdpe') {
+            const sdr = parseFloat(document.getElementById('pn_select').value);
+            const wallThickness = dn / (2 * sdr);
+            return dn - (2 * wallThickness);
+        }
+        return dn; // Ống gang/thép tính trực tiếp theo DN danh nghĩa
+    }
+
+    function getPADetails(dn, Q_m3s, L, C, matKey) {
+        const d_in_mm = getDIn(dn, matKey);
+        const D_m = d_in_mm / 1000.0;
         const Area = (Math.PI * Math.pow(D_m, 2)) / 4.0;
         const v_actual = Q_m3s / Area;
         const hf = (10.67 * L * Math.pow(Q_m3s, 1.852)) / (Math.pow(C, 1.852) * Math.pow(D_m, 4.87));
         const i_m_km = (hf / L) * 1000.0;
-        return { dn: dn, v: v_actual, hf: hf, i: i_m_km };
+        return { dn: dn, d_in: d_in_mm, v: v_actual, hf: hf, i: i_m_km };
     }
 
     function calculatePipe() {
@@ -245,26 +275,27 @@
         const Q_m3day = Q_m3h * 24;
         const dnList = STANDARD_DN[matKey];
 
-        // 1. Phương án chọn thuần theo vận tốc (DN lớn hơn D_calc)
+        // 1. Phương án thuần theo vận tốc (Chọn DN có Dtrong >= D_calc_mm)
         let pa_v_DN = dnList[dnList.length - 1];
         for (let i = 0; i < dnList.length; i++) {
-            if (dnList[i] >= D_calc_mm) {
+            const d_in = getDIn(dnList[i], matKey);
+            if (d_in >= D_calc_mm) {
                 pa_v_DN = dnList[i];
                 break;
             }
         }
-        const pa_v_res = getPADetails(pa_v_DN, Q_m3s, L, C);
+        const pa_v_res = getPADetails(pa_v_DN, Q_m3s, L, C, matKey);
 
-        // 2. Phương án Tối ưu (Duyệt tìm DN nhỏ nhất thỏa mãn i <= i_max)
+        // 2. Phương án Tối ưu (Tự động duyệt tăng DN cho tới khi i <= i_max_limit)
         let pa_opt_DN = dnList[dnList.length - 1];
         for (let i = 0; i < dnList.length; i++) {
-            const tempRes = getPADetails(dnList[i], Q_m3s, L, C);
+            const tempRes = getPADetails(dnList[i], Q_m3s, L, C, matKey);
             if (tempRes.i <= i_max_limit && tempRes.v <= 2.0) {
                 pa_opt_DN = dnList[i];
                 break;
             }
         }
-        const pa_opt_res = getPADetails(pa_opt_DN, Q_m3s, L, C);
+        const pa_opt_res = getPADetails(pa_opt_DN, Q_m3s, L, C, matKey);
 
         // Hiển thị kết quả chung
         document.getElementById('res_d_calc').innerText = D_calc_mm.toFixed(1);
@@ -272,7 +303,7 @@
         document.getElementById('res_qday').innerText = `${(Q_m3day / 1000).toFixed(3)} m³/ngđ`;
 
         // Hiển thị PA thuần theo Vận tốc
-        document.getElementById('pa_v_dn').innerText = `DN${pa_v_res.dn} (${pa_v_res.dn} mm)`;
+        document.getElementById('pa_v_dn').innerText = `DN${pa_v_res.dn} (Dᵢₙ = ${pa_v_res.d_in.toFixed(1)} mm)`;
         document.getElementById('pa_v_v').innerText = `${pa_v_res.v.toFixed(2)} m/s`;
         document.getElementById('pa_v_hf').innerText = `${pa_v_res.hf.toFixed(2)} m`;
         document.getElementById('pa_v_i').innerText = `${pa_v_res.i.toFixed(2)} m/km`;
@@ -286,7 +317,7 @@
         }
 
         // Hiển thị PA Tối ưu cả v và Hf
-        document.getElementById('pa_opt_dn').innerText = `DN${pa_opt_res.dn} (${pa_opt_res.dn} mm)`;
+        document.getElementById('pa_opt_dn').innerText = `DN${pa_opt_res.dn} (Dᵢₙ = ${pa_opt_res.d_in.toFixed(1)} mm)`;
         document.getElementById('pa_opt_v').innerText = `${pa_opt_res.v.toFixed(2)} m/s`;
         document.getElementById('pa_opt_hf').innerText = `${pa_opt_res.hf.toFixed(2)} m`;
         document.getElementById('pa_opt_i').innerText = `${pa_opt_res.i.toFixed(2)} m/km`;
@@ -301,6 +332,7 @@
     }
 
     window.onload = function() {
+        togglePnVisibility();
         toggleMode();
     };
 </script>
