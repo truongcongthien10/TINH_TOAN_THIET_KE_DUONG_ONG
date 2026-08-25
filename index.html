@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tính Toán & So Sánh Phương Án Đường Kính Ống Tối Ưu</title>
+    <style>
+        :root {
+            --excel-green: #107c41;
+            --excel-green-dark: #0b5c30;
+            --section-bg: #e2efda;
+            --bg-color: #f4f7f5;
+            --card-bg: #ffffff;
+            --border-color: #c8d6c9;
+            --text-color: #242424;
+            --accent-blue: #0066cc;
+            --pa2-color: #d97706;
+            --pa2-bg: #fef3c7;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; background: var(--bg-color); color: var(--text-color); padding: 15px; }
+        .container { max-width: 780px; margin: 0 auto; background: var(--card-bg); border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); overflow: hidden; border: 1px solid var(--border-color); }
+        
+        .header-bar { background: var(--excel-green); color: #fff; text-align: center; padding: 14px; font-size: 1.15rem; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; }
+        .content { padding: 15px 20px; }
+
+        .section-title { background: var(--section-bg); color: var(--excel-green-dark); padding: 8px 12px; font-weight: bold; font-size: 0.95rem; border-left: 4px solid var(--excel-green); border-radius: 2px; margin-bottom: 12px; }
+
+        .mode-selector { margin-bottom: 15px; background: #f0f7f0; padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); }
+        .mode-selector label { font-weight: bold; color: var(--excel-green-dark); }
+
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; }
+        @media (max-width: 550px) { .form-grid { grid-template-columns: 1fr; } }
+
+        .form-group { display: flex; flex-direction: column; }
+        .form-group.full-width { grid-column: 1 / -1; }
+        
+        label { font-size: 0.85rem; margin-bottom: 5px; font-weight: 600; color: #333; }
+        input, select { padding: 8px 10px; border: 1px solid var(--border-color); background: #fdfdfd; border-radius: 4px; font-size: 0.95rem; outline: none; height: 38px; width: 100%; }
+        input:focus, select:focus { border-color: var(--excel-green); box-shadow: 0 0 0 2px rgba(16, 124, 65, 0.15); }
+
+        .btn-calc { width: 100%; background: var(--accent-blue); color: white; border: none; padding: 12px; font-size: 1rem; font-weight: bold; border-radius: 5px; cursor: pointer; margin-bottom: 20px; transition: background 0.2s; }
+        .btn-calc:hover { background: #0052a3; }
+
+        .calc-info-box { text-align: center; margin-bottom: 15px; font-size: 0.95rem; color: #444; background: #f8faf8; padding: 8px; border-radius: 4px; border: 1px dashed var(--border-color); }
+
+        /* Lưới so sánh 2 phương án */
+        .comparison-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+        @media (max-width: 550px) { .comparison-grid { grid-template-columns: 1fr; } }
+
+        .pa-card { border-radius: 6px; padding: 12px; border: 1px solid var(--border-color); }
+        .pa-card.pa1 { background: #e8f5e9; border-color: #c8e6c9; }
+        .pa-card.pa2 { background: var(--pa2-bg); border-color: #fde68a; }
+
+        .pa-header { font-size: 0.85rem; font-weight: bold; margin-bottom: 6px; text-transform: uppercase; }
+        .pa1 .pa-header { color: var(--excel-green-dark); }
+        .pa2 .pa-header { color: #9a3412; }
+
+        .pa-dn { font-size: 1.4rem; font-weight: bold; margin-bottom: 8px; }
+        .pa1 .pa-dn { color: #000; }
+        .pa2 .pa-dn { color: #7c2d12; }
+
+        .pa-details { list-style: none; font-size: 0.85rem; }
+        .pa-details li { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px dashed rgba(0,0,0,0.08); }
+        .pa-details li:last-child { border-bottom: none; }
+        
+        .warn-text { color: #dc2626; font-weight: bold; }
+        .ok-text { color: var(--excel-green-dark); font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-bar">TÍNH TOÁN & SO SÁNH PHƯƠNG ÁN ĐƯỜNG KÍNH ỐNG</div>
+    <div class="content">
+        
+        <!-- BỘ CHỌN CHẾ ĐỘ -->
+        <div class="mode-selector">
+            <div class="form-group">
+                <label for="calcMode">Phương pháp tính toán:</label>
+                <select id="calcMode" onchange="toggleMode()">
+                    <option value="by_q">Cách 1: Nhập Lưu lượng Q → Chọn Đường kính D</option>
+                    <option value="by_dp">Cách 2: Nhập Chênh áp (P1-P2) & Vận tốc v → Tự tính Q & D</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- I. THÔNG SỐ ĐẦU VÀO -->
+        <div class="section-title">I. THÔNG SỐ THIẾT KẾ ĐẦU VÀO</div>
+        <div class="form-grid">
+            
+            <!-- Trường nhập Lưu lượng (Chế độ 1) -->
+            <div class="form-group full-width" id="group_q">
+                <label for="q_input">Lưu lượng thiết kế Q (m³/h):</label>
+                <input type="number" id="q_input" value="88.39" step="0.1" min="0.01">
+            </div>
+
+            <!-- Trường nhập Áp lực (Chế độ 2) -->
+            <div class="form-group mode-dp" style="display:none;">
+                <label for="p1">Áp lực đầu P₁ (bar):</label>
+                <input type="number" id="p1" value="3.0" step="0.1" min="0">
+            </div>
+            <div class="form-group mode-dp" style="display:none;">
+                <label for="p2">Áp lực cuối P₂ (bar):</label>
+                <input type="number" id="p2" value="2.0" step="0.1" min="0">
+            </div>
+
+            <div class="form-group">
+                <label for="length">Chiều dài tuyến L (m):</label>
+                <input type="number" id="length" value="1000" min="1">
+            </div>
+            <div class="form-group">
+                <label for="v_select">Vận tốc kinh tế chọn v (m/s):</label>
+                <input type="number" id="v_select" value="1.2" step="0.1" max="3.0" min="0.1">
+            </div>
+            <div class="form-group full-width">
+                <label for="material">Vật liệu ống (Hệ số nhám C):</label>
+                <select id="material" onchange="calculatePipe()">
+                    <option value="hdpe">Ống nhựa HDPE / uPVC / PPR (C = 150)</option>
+                    <option value="ductile" selected>Gang dẻo mới (C = 130)</option>
+                    <option value="ductile_old">Gang dẻo cũ (C = 100)</option>
+                    <option value="steel">Ống Thép mới (C = 130)</option>
+                </select>
+            </div>
+        </div>
+
+        <button class="btn-calc" onclick="calculatePipe()">Tính Toán & So Sánh 2 Phương Án</button>
+
+        <!-- II. KẾT QUẢ SO SÁNH -->
+        <div class="section-title">II. BẢNG SO SÁNH PHƯƠNG ÁN ĐƯỜNG KÍNH</div>
+        
+        <div class="calc-info-box">
+            Đường kính tính toán lý thuyết: <b>D<sub>tính</sub> = <span id="res_d_calc">161.4</span> mm</b><br>
+            Lưu lượng quy đổi: <b id="res_qh">88.39 m³/h</b> (<span id="res_qday">2.121 m³/ngđ</span>)
+        </div>
+
+        <div class="comparison-grid">
+            <!-- PHƯƠNG ÁN 1 -->
+            <div class="pa-card pa1">
+                <div class="pa-header">PA1: AN TOÀN / TIÊU CHUẨN (Cỡ trên)</div>
+                <div class="pa-dn" id="pa1_dn">DN200 (200 mm)</div>
+                <ul class="pa-details">
+                    <li><span>Vận tốc thực tế (v):</span> <b id="pa1_v">0.78 m/s</b></li>
+                    <li><span>Tổn thất cột áp (H<sub>f</sub>):</span> <b id="pa1_hf">2.42 m</b></li>
+                    <li><span>Đánh giá vận tốc:</span> <span id="pa1_status" class="ok-text">An toàn (≤ 2.0 m/s)</span></li>
+                </ul>
+            </div>
+
+            <!-- PHƯƠNG ÁN 2 -->
+            <div class="pa-card pa2">
+                <div class="pa-header">PA2: TIẾT KIỆM / EP ỐNG (Cỡ dưới)</div>
+                <div class="pa-dn" id="pa2_dn">DN150 (150 mm)</div>
+                <ul class="pa-details">
+                    <li><span>Vận tốc thực tế (v):</span> <b id="pa2_v">1.39 m/s</b></li>
+                    <li><span>Tổn thất cột áp (H<sub>f</sub>):</span> <b id="pa2_hf">9.86 m</b></li>
+                    <li><span>Đánh giá vận tốc:</span> <span id="pa2_status" class="ok-text">Chấp nhận được</span></li>
+                </ul>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    const STANDARD_DN = {
+        // Gang dẻo: Không có DN160
+        ductile: [80, 100, 150, 200, 250, 300, 350, 400, 450, 500, 600, 700, 800, 900, 1000, 1200],
+        ductile_old: [80, 100, 150, 200, 250, 300, 350, 400, 450, 500, 600, 700, 800, 900, 1000, 1200],
+        hdpe: [63, 75, 90, 110, 140, 160, 200, 225, 250, 280, 315, 355, 400, 450, 500, 630],
+        steel: [50, 65, 80, 100, 125, 150, 200, 250, 300, 350, 400, 450, 500, 600]
+    };
+
+    const HW_C_VALUES = {
+        hdpe: 150,
+        ductile: 130,
+        ductile_old: 100,
+        steel: 130
+    };
+
+    function toggleMode() {
+        const mode = document.getElementById('calcMode').value;
+        const groupQ = document.getElementById('group_q');
+        const modeDpElems = document.querySelectorAll('.mode-dp');
+
+        if (mode === 'by_q') {
+            groupQ.style.display = 'flex';
+            modeDpElems.forEach(el => el.style.display = 'none');
+        } else {
+            groupQ.style.display = 'none';
+            modeDpElems.forEach(el => el.style.display = 'flex');
+        }
+        calculatePipe();
+    }
+
+    function calculatePipe() {
+        const mode = document.getElementById('calcMode').value;
+        const L = parseFloat(document.getElementById('length').value);
+        const v_select = parseFloat(document.getElementById('v_select').value);
+        const matKey = document.getElementById('material').value;
+        const C = HW_C_VALUES[matKey];
+
+        let Q_m3h = 0;
+        let D_calc_mm = 0;
+
+        if (mode === 'by_q') {
+            Q_m3h = parseFloat(document.getElementById('q_input').value);
+            if (isNaN(Q_m3h) || Q_m3h <= 0) return;
+
+            const Q_m3s = Q_m3h / 3600.0;
+            const D_m = Math.sqrt((4 * Q_m3s) / (Math.PI * v_select));
+            D_calc_mm = D_m * 1000;
+
+        } else {
+            const p1 = parseFloat(document.getElementById('p1').value);
+            const p2 = parseFloat(document.getElementById('p2').value);
+            if (isNaN(p1) || isNaN(p2) || p1 <= p2) return;
+
+            const hf_available = (p1 - p2) * 10.1972;
+            
+            const term1 = 10.67 * L;
+            const term2 = Math.pow(v_select * Math.PI / 4, 1.852);
+            const term3 = hf_available * Math.pow(C, 1.852);
+
+            const D_m_pow = (term1 * term2) / term3;
+            const D_m = Math.pow(D_m_pow, 1 / 0.834);
+            D_calc_mm = D_m * 1000;
+
+            const Q_m3s = v_select * (Math.PI * Math.pow(D_m, 2)) / 4.0;
+            Q_m3h = Q_m3s * 3600;
+        }
+
+        // Chọn DN cho PA1 (Cỡ lớn hơn liền kề) và PA2 (Cỡ nhỏ hơn liền kề)
+        const dnList = STANDARD_DN[matKey];
+        let pa1_DN = dnList[dnList.length - 1];
+        let pa2_DN = dnList[0];
+
+        for (let i = 0; i < dnList.length; i++) {
+            if (dnList[i] >= D_calc_mm) {
+                pa1_DN = dnList[i];
+                pa2_DN = (i > 0) ? dnList[i - 1] : dnList[0];
+                break;
+            }
+        }
+
+        // Tính chi tiết cho 2 phương án
+        const Q_m3s = Q_m3h / 3600.0;
+        const Q_m3day = Q_m3h * 24;
+
+        function getPADetails(dn) {
+            const D_m = dn / 1000.0;
+            const Area = (Math.PI * Math.pow(D_m, 2)) / 4.0;
+            const v_actual = Q_m3s / Area;
+            const hf = (10.67 * L * Math.pow(Q_m3s, 1.852)) / (Math.pow(C, 1.852) * Math.pow(D_m, 4.87));
+            return { v: v_actual, hf: hf };
+        }
+
+        const pa1_res = getPADetails(pa1_DN);
+        const pa2_res = getPADetails(pa2_DN);
+
+        // Cập nhật lên giao diện
+        document.getElementById('res_d_calc').innerText = D_calc_mm.toFixed(1);
+        document.getElementById('res_qh').innerText = `${Q_m3h.toFixed(2)} m³/h`;
+        document.getElementById('res_qday').innerText = `${(Q_m3day / 1000).toFixed(3)} m³/ngđ`;
+
+        // PA1
+        document.getElementById('pa1_dn').innerText = `DN${pa1_DN} (${pa1_DN} mm)`;
+        document.getElementById('pa1_v').innerText = `${pa1_res.v.toFixed(2)} m/s`;
+        document.getElementById('pa1_hf').innerText = `${pa1_res.hf.toFixed(2)} m`;
+        document.getElementById('pa1_status').className = pa1_res.v <= 2.0 ? 'ok-text' : 'warn-text';
+        document.getElementById('pa1_status').innerText = pa1_res.v <= 2.0 ? 'An toàn (≤ 2.0 m/s)' : 'Cảnh báo: v > 2.0 m/s';
+
+        // PA2
+        document.getElementById('pa2_dn').innerText = `DN${pa2_DN} (${pa2_DN} mm)`;
+        document.getElementById('pa2_v').innerText = `${pa2_res.v.toFixed(2)} m/s`;
+        document.getElementById('pa2_hf').innerText = `${pa2_res.hf.toFixed(2)} m`;
+        document.getElementById('pa2_status').className = pa2_res.v <= 2.0 ? 'ok-text' : 'warn-text';
+        document.getElementById('pa2_status').innerText = pa2_res.v <= 2.0 ? 'Chấp nhận được' : 'Vận tốc cao (> 2.0 m/s)';
+    }
+
+    window.onload = function() {
+        toggleMode();
+    };
+</script>
+</body>
+</html>
