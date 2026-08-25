@@ -68,7 +68,7 @@
     <div class="header-bar">CÔNG CỤ TÍNH THỦY LỰC ĐƯỜNG ỐNG</div>
     
     <div class="tab-container">
-        <button class="tab-btn active" onclick="switchMode('mode1')">TH1: Tự tính V (Hiện trường)</button>
+        <button class="tab-btn active" onclick="switchMode('mode1')">TH1: Tự Tính V (Hiện trường)</button>
         <button class="tab-btn" onclick="switchMode('mode2')">TH2: Nhập V Cần tính toán (Thiết kế)</button>
     </div>
 
@@ -76,7 +76,7 @@
         <!-- TRƯỜNG HỢP 1 -->
         <div id="mode1">
             <div class="mode-desc">
-                📌 <b>Trường hợp 1:</b> Tự động tính <b>Vận tốc thực tế (v)</b> theo độ sụt áp (P1 - P2) & chiều dài (L), sau đó đối chiếu với dải vận tốc kinh tế phù hợp từng đường kính D.
+                📌 <b>Trường hợp 1:</b> Tự động tính <b>Vận tốc thực tế ($v$)</b> theo độ sụt áp ($P_1 - P_2$) & chiều dài ($L$), đối chiếu dải vận tốc kinh tế theo cấp đường kính $D$.
             </div>
             <div class="section-title">I. Thông Số Đầu Vào</div>
             <div class="form-grid">
@@ -124,7 +124,7 @@
         <!-- TRƯỜNG HỢP 2 -->
         <div id="mode2" style="display: none;">
             <div class="mode-desc">
-                📌 <b>Trường hợp 2:</b> Nhập <b>Vận tốc đề xuất ($v$)</b> để tính Lưu lượng ($Q$) và Chiều dài tối đa ($L_{max}$). Cảnh báo nếu $v$ vượt ngưỡng kinh tế của cấp đường kính.
+                📌 <b>Trường hợp 2:</b> Nhập <b>Vận tốc đề xuất ($v$)</b> để tính Lưu lượng ($Q$) và Chiều dài tối đa ($L_{max}$). Cảnh báo nếu $v$ vượt dải kinh tế của cấp đường kính.
             </div>
             <div class="section-title">I. Thông Số Đầu Vào</div>
             <div class="form-grid">
@@ -157,7 +157,7 @@
                 </div>
                 <div class="form-group">
                     <label>Vận tốc chọn v (m/s):</label>
-                    <input type="number" id="m2_v" value="1.2" step="0.1" inputmode="decimal" oninput="calcMode2()">
+                    <input type="number" id="m2_v" value="1.0" step="0.1" inputmode="decimal" oninput="calcMode2()">
                 </div>
             </div>
 
@@ -176,7 +176,6 @@
 </div>
 
 <script>
-    // Danh mục đường kính chuẩn
     const diameterOptions = {
         hdpe: [16, 20, 25, 32, 40, 50, 63, 75, 90, 110, 125, 140, 160, 225, 250, 280, 315, 355, 450, 560, 630, 710, 800, 900, 1000, 1200],
         pvc: [21, 27, 34, 42, 49, 60, 75, 90, 110, 140, 160, 200, 225, 250, 280, 315, 355, 400, 450, 500],
@@ -187,19 +186,19 @@
     };
 
     /**
-     * Hàm trả về giới hạn vận tốc kinh tế & vai trò tuyến ống dựa theo D
+     * Hàm phân loại Cấp ống & Vận tốc kinh tế theo D
      */
     function getEconVelocityRules(dMm) {
         if (dMm < 150) {
-            return { min: 0.6, max: 1.0, role: "Ống nhánh / Ống dịch vụ", loss: "5 - 10 m/1km" };
+            return { grade: "Cấp III", role: "Ống nhánh / Ống dịch vụ", min: 0.6, max: 1.0 };
         } else if (dMm < 300) {
-            return { min: 0.9, max: 1.2, role: "Ống phân phối khu vực", loss: "4 - 8 m/1km" };
+            return { grade: "Cấp II", role: "Ống phân phối khu vực", min: 0.9, max: 1.2 };
         } else if (dMm <= 500) {
-            return { min: 1.1, max: 1.4, role: "Ống truyền dẫn chính quận/huyện", loss: "3 - 6 m/1km" };
+            return { grade: "Cấp I", role: "Ống truyền dẫn chính", min: 1.1, max: 1.4 };
         } else if (dMm <= 800) {
-            return { min: 1.3, max: 1.6, role: "Trục truyền tải đô thị", loss: "2 - 5 m/1km" };
+            return { grade: "Tuyến ống truyền tải", role: "Trục truyền tải đô thị", min: 1.3, max: 1.6 };
         } else {
-            return { min: 1.5, max: 1.8, role: "Tuyến đại truyền tải", loss: "1.5 - 4 m/1km" };
+            return { grade: "Tuyến ống truyền tải", role: "Tuyến đại truyền tải", min: 1.5, max: 1.8 };
         }
     }
 
@@ -220,8 +219,8 @@
 
         if (list.includes(currentVal)) {
             dSelect.value = currentVal;
-        } else if (list.includes(450)) {
-            dSelect.value = 450;
+        } else if (list.includes(75)) {
+            dSelect.value = 75;
         } else {
             dSelect.selectedIndex = Math.floor(list.length / 2);
         }
@@ -239,16 +238,16 @@
         if (mode === 'mode1') calcMode1(); else calcMode2();
     }
 
-    function renderWarningBox(boxId, vVal, rule, isTheory = false) {
+    function renderWarningBox(boxId, vVal, rule, dMm, isTheory = false) {
         const box = document.getElementById(boxId);
-        let html = `<b>Cấp ống:</b> ${rule.role} (DN${document.getElementById(boxId === 'm1_warn' ? 'm1_d' : 'm2_d').value})<br>`;
+        let html = `<b>Cấp ống:</b> ${rule.grade} - ${rule.role} (DN${dMm})<br>`;
         html += `<b>Vận tốc kinh tế tiêu chuẩn ($v_{kt}$):</b> ${rule.min} - ${rule.max} m/s<br>`;
 
         if (vVal < rule.min) {
             box.style.backgroundColor = 'var(--warn-yellow-bg)';
             box.style.borderColor = 'var(--warn-yellow-border)';
             box.style.color = 'var(--warn-yellow-text)';
-            html += `⚠️ <b>Đánh giá:</b> Vận tốc ${isTheory ? 'tự nhiên' : 'thiết kế'} <b>${vVal.toFixed(2)} m/s</b> nhỏ hơn dải kinh tế. Đường ống có nguy cơ đọng cặn, chưa tối ưu chi phí đầu tư.`;
+            html += `⚠️ <b>Đánh giá:</b> Vận tốc ${isTheory ? 'tự nhiên' : 'thiết kế'} <b>${vVal.toFixed(2)} m/s</b> nhỏ hơn dải kinh tế. Nguy cơ đọng cặn, chưa tối ưu chi phí đầu tư.`;
         } else if (vVal > rule.max) {
             box.style.backgroundColor = 'var(--warn-red-bg)';
             box.style.borderColor = 'var(--warn-red-border)';
@@ -258,7 +257,7 @@
             box.style.backgroundColor = 'var(--warn-green-bg)';
             box.style.borderColor = 'var(--warn-green-border)';
             box.style.color = 'var(--warn-green-text)';
-            html += `✅ <b>Đánh giá:</b> Vận tốc <b>${vVal.toFixed(2)} m/s</b> nằm trong dải kinh tế tối ưu. Hệ thống đạt hiệu quả cao nhất về chi phí và độ bền!`;
+            html += `✅ <b>Đánh giá:</b> Vận tốc <b>${vVal.toFixed(2)} m/s</b> nằm trong dải kinh tế tối ưu. Hệ thống đạt hiệu quả cao nhất!`;
         }
 
         box.innerHTML = html;
@@ -288,7 +287,7 @@
         document.getElementById('m1_res_qday').innerText = Math.round(qM3s * 86400).toLocaleString('vi-VN') + " m³/ngđ";
 
         const rule = getEconVelocityRules(dMm);
-        renderWarningBox('m1_warn', vReal, rule, true);
+        renderWarningBox('m1_warn', vReal, rule, dMm, true);
     }
 
     function calcMode2() {
@@ -316,7 +315,7 @@
         document.getElementById('m2_res_lmax').innerText = Math.round(Lmax).toLocaleString('vi-VN') + " m";
 
         const rule = getEconVelocityRules(dMm);
-        renderWarningBox('m2_warn', vInput, rule, false);
+        renderWarningBox('m2_warn', vInput, rule, dMm, false);
     }
 
     window.onload = function() {
