@@ -16,11 +16,9 @@
             --btn-blue: #0070c0;
             --result-bg: #eef7ee;
             
-            /* Màu định dạng chữ trong Warning Box */
             --text-blue: #0070c0;
             --text-red: #d9534f;
 
-            /* Dải màu nền cảnh báo */
             --warn-red-bg: #f8d7da;
             --warn-red-border: #f5c6cb;
 
@@ -62,7 +60,6 @@
         .warning-box { padding: 8px 12px; border-radius: 4px; font-size: 0.82rem; margin-top: 8px; font-weight: 500; line-height: 1.45; }
         .mode-desc { font-size: 0.83rem; color: #444; background: #f5f5f5; padding: 8px 10px; border-radius: 4px; border-left: 3px solid var(--btn-blue); margin-bottom: 10px; line-height: 1.35; }
 
-        /* Style phân màu từng dòng thông báo */
         .info-blue { color: var(--text-blue); }
         .alert-red { color: var(--text-red); }
     </style>
@@ -73,15 +70,15 @@
     <div class="header-bar">CÔNG CỤ TÍNH THỦY LỰC ĐƯỜNG ỐNG</div>
     
     <div class="tab-container">
-        <button class="tab-btn active" onclick="switchMode('mode1')">TH1: Tự Tính V (Hiện trường)</button>
-        <button class="tab-btn" onclick="switchMode('mode2')">TH2: Nhập V Cần tính toán (Thiết kế)</button>
+        <button class="tab-btn active" onclick="switchMode('mode1')">TH1: Tính Theo V Kinh Tế (Chuẩn Thiết Kế)</button>
+        <button class="tab-btn" onclick="switchMode('mode2')">TH2: Nhập V Cần tính toán (Tùy Chỉnh)</button>
     </div>
 
     <div class="content">
         <!-- TRƯỜNG HỢP 1 -->
         <div id="mode1">
             <div class="mode-desc">
-                📌 <b>Trường hợp 1:</b> Tự động tính <b>Vận tốc thực tế (v)</b> theo độ sụt áp (P<sub>1</sub> - P<sub>2</sub>) & chiều dài (L), đối chiếu dải vận tốc kinh tế theo cấp đường kính D.
+                📌 <b>Trường hợp 1:</b> Tự động áp dụng <b>Vận tốc kinh tế chuẩn ($v_{kt}$)</b> của cấp đường kính D để tính Lưu lượng (Q) chuẩn thiết kế, đồng thời cảnh báo nếu chênh áp hiện trường vượt ngưỡng.
             </div>
             <div class="section-title">I. Thông Số Đầu Vào</div>
             <div class="form-grid">
@@ -110,18 +107,19 @@
                 </div>
                 <div class="form-group" style="grid-column: 1 / -1;">
                     <label>Chiều dài ống L (m):</label>
-                    <input type="number" id="m1_l" value="500" step="10" inputmode="decimal" onfocus="this.select()" onchange="calcMode1()">
+                    <input type="number" id="m1_l" value="1000" step="10" inputmode="decimal" onfocus="this.select()" onchange="calcMode1()">
                 </div>
             </div>
 
             <button class="btn-calc" onclick="calcMode1()">Tính Toán (TH1)</button>
 
-            <div class="section-title">II. Kết Quả Tính Toán</div>
+            <div class="section-title">II. KẾT QUẢ TÍNH THEO V KINNH TẾ (v<sub>kt</sub>)</div>
             <div class="result-box">
-                <div class="result-item"><span class="result-label">Tổn thất cột áp (H<sub>f</sub>):</span><span class="total-highlight" id="m1_res_hf">- m</span></div>
-                <div class="result-item"><span class="result-label">Vận tốc thực tế trong ống (v<sub>thực</sub>):</span><span class="total-highlight" id="m1_res_v">- m/s</span></div>
-                <div class="result-item"><span class="result-label">Lưu lượng quy đổi (Q):</span><span class="total-highlight" id="m1_res_qh">- m³/h</span></div>
+                <div class="result-item"><span class="result-label">Vận tốc kinh tế áp dụng (v<sub>kt</sub>):</span><span class="total-highlight" id="m1_res_vkt">- m/s</span></div>
+                <div class="result-item"><span class="result-label">Lưu lượng quy đổi kinh tế (Q<sub>kt</sub>):</span><span class="total-highlight" id="m1_res_qh">- m³/h</span></div>
                 <div class="result-item"><span class="result-label">Lưu lượng ngày đêm (Q<sub>ngđ</sub>):</span><span class="total-highlight" id="m1_res_qday">- m³/ngđ</span></div>
+                <div class="result-item"><span class="result-label">Tổn thất cột áp khả dụng (H<sub>f</sub>):</span><span class="total-highlight" id="m1_res_hf">- m</span></div>
+                <div class="result-item"><span class="result-label">Chiều dài ống đề xuất cho v<sub>kt</sub> (L<sub>kt_min</sub>):</span><span class="total-highlight" id="m1_res_lkt">- m</span></div>
             </div>
             <div class="warning-box" id="m1_warn"></div>
         </div>
@@ -129,7 +127,7 @@
         <!-- TRƯỜNG HỢP 2 -->
         <div id="mode2" style="display: none;">
             <div class="mode-desc">
-                📌 <b>Trường hợp 2:</b> Nhập <b>Vận tốc đề xuất (v)</b> để tính Lưu lượng (Q) và Chiều dài tối đa (L<sub>max</sub>). Cảnh báo nếu v vượt dải kinh tế của cấp đường kính.
+                📌 <b>Trường hợp 2:</b> Nhập <b>Vận tốc đề xuất (v)</b> để tính Lưu lượng (Q) và Chiều dài tối đa (L<sub>max</sub>).
             </div>
             <div class="section-title">I. Thông Số Đầu Vào</div>
             <div class="form-grid">
@@ -158,11 +156,11 @@
                 </div>
                 <div class="form-group">
                     <label>Chiều dài ống L (m):</label>
-                    <input type="number" id="m2_l" value="500" step="10" inputmode="decimal" onfocus="this.select()" onchange="calcMode2()">
+                    <input type="number" id="m2_l" value="1000" step="10" inputmode="decimal" onfocus="this.select()" onchange="calcMode2()">
                 </div>
                 <div class="form-group">
                     <label>Vận tốc chọn v (m/s):</label>
-                    <input type="number" id="m2_v" value="1.0" step="0.1" inputmode="decimal" onfocus="this.select()" oninput="calcMode2()">
+                    <input type="number" id="m2_v" value="1.5" step="0.1" inputmode="decimal" onfocus="this.select()" oninput="calcMode2()">
                 </div>
             </div>
 
@@ -221,8 +219,8 @@
 
         if (list.includes(currentVal)) {
             dSelect.value = currentVal;
-        } else if (list.includes(75)) {
-            dSelect.value = 75;
+        } else if (list.includes(800)) {
+            dSelect.value = 800;
         } else {
             dSelect.selectedIndex = Math.floor(list.length / 2);
         }
@@ -240,30 +238,6 @@
         if (mode === 'mode1') calcMode1(); else calcMode2();
     }
 
-    function renderWarningBox(boxId, vVal, rule, dMm, isTheory = false) {
-        const box = document.getElementById(boxId);
-
-        let html = `<div class="info-blue"><b>Cấp ống:</b> ${rule.grade} - ${rule.role} (DN${dMm})</div>`;
-        html += `<div class="info-blue"><b>Vận tốc kinh tế tiêu chuẩn (v<sub>kt</sub>):</b> ${rule.min} - ${rule.max} m/s</div>`;
-
-        if (vVal < rule.min) {
-            box.style.backgroundColor = 'var(--warn-yellow-bg)';
-            box.style.borderColor = 'var(--warn-yellow-border)';
-            html += `<div class="alert-red">⚠️ <b>Đánh giá:</b> Vận tốc ${isTheory ? 'tự nhiên' : 'thiết kế'} <b>${vVal.toFixed(2)} m/s</b> nhỏ hơn dải kinh tế. Nguy cơ đọng cặn, chưa tối ưu chi phí đầu tư.</div>`;
-        } else if (vVal > rule.max) {
-            box.style.backgroundColor = 'var(--warn-red-bg)';
-            box.style.borderColor = 'var(--warn-red-border)';
-            html += `<div class="alert-red">🚫 <b>Cảnh báo:</b> Vận tốc ${isTheory ? 'tự nhiên' : 'thiết kế'} <b>${vVal.toFixed(2)} m/s</b> vượt quá ngưỡng kinh tế (${rule.max} m/s). Nguy cơ gây tổn thất áp lực cao trong đường ống / búa nước và tăng chi phí điện năng.</div>`;
-        } else {
-            box.style.backgroundColor = 'var(--warn-green-bg)';
-            box.style.borderColor = 'var(--warn-green-border)';
-            html += `<div class="alert-red">✅ <b>Đánh giá:</b> Vận tốc <b>${vVal.toFixed(2)} m/s</b> nằm trong dải kinh tế tối ưu. Hệ thống đạt hiệu quả cao nhất!</div>`;
-        }
-
-        box.innerHTML = html;
-        box.style.display = 'block';
-    }
-
     function calcMode1() {
         const p1 = parseFloat(document.getElementById('m1_p1').value) || 0;
         const p2 = parseFloat(document.getElementById('m1_p2').value) || 0;
@@ -278,16 +252,44 @@
         const hf = ((p1 - p2) * 100000) / 9810.0;
         const dM = dMm / 1000.0;
         const area = (Math.PI * Math.pow(dM, 2)) / 4.0;
-        const qM3s = 0.2785 * C * Math.pow(dM, 2.63) * Math.pow(hf / L, 0.54);
-        const vReal = qM3s / area;
-
-        document.getElementById('m1_res_hf').innerText = hf.toFixed(2) + " m";
-        document.getElementById('m1_res_v').innerText = vReal.toFixed(2) + " m/s";
-        document.getElementById('m1_res_qh').innerText = (qM3s * 3600).toFixed(2) + " m³/h";
-        document.getElementById('m1_res_qday').innerText = Math.round(qM3s * 86400).toLocaleString('vi-VN') + " m³/ngđ";
-
+        
+        // 1. Lấy dải vận tốc kinh tế & chọn vận tốc trung bình v_kt
         const rule = getEconVelocityRules(dMm);
-        renderWarningBox('m1_warn', vReal, rule, dMm, true);
+        const vKt = (rule.min + rule.max) / 2.0;
+
+        // 2. Tính Lưu lượng Q theo v_kt
+        const qM3s_kt = vKt * area;
+
+        // 3. Tính chiều dài ống tối thiểu cần có (L_kt) để áp lực rơi hết hf với vận tốc v_kt
+        const L_kt = (hf * Math.pow(C, 1.852) * Math.pow(dM, 4.87)) / (11.737 * Math.pow(qM3s_kt, 1.852));
+
+        // 4. Tính vận tốc thực tế chảy tự do theo cột áp (để cảnh báo)
+        const qM3s_free = 0.2785 * C * Math.pow(dM, 2.63) * Math.pow(hf / L, 0.54);
+        const vFree = qM3s_free / area;
+
+        // Xuất kết quả chuẩn theo V_kt
+        document.getElementById('m1_res_vkt').innerText = vKt.toFixed(2) + " m/s (" + rule.min + "-" + rule.max + ")";
+        document.getElementById('m1_res_qh').innerText = (qM3s_kt * 3600).toFixed(2) + " m³/h";
+        document.getElementById('m1_res_qday').innerText = Math.round(qM3s_kt * 86400).toLocaleString('vi-VN') + " m³/ngđ";
+        document.getElementById('m1_res_hf').innerText = hf.toFixed(2) + " m";
+        document.getElementById('m1_res_lkt').innerText = Math.round(L_kt).toLocaleString('vi-VN') + " m";
+
+        // Khối cảnh báo
+        const box = document.getElementById('m1_warn');
+        let html = `<div class="info-blue"><b>Cấp ống:</b> ${rule.grade} - ${rule.role} (DN${dMm})</div>`;
+        html += `<div class="info-blue"><b>Dải vận tốc kinh tế:</b> ${rule.min} - ${rule.max} m/s</div>`;
+
+        if (L < L_kt) {
+            box.style.backgroundColor = 'var(--warn-red-bg)';
+            box.style.borderColor = 'var(--warn-red-border)';
+            html += `<div class="alert-red">⚠️ <b>Lưu ý hiện trường:</b> Chiều dài hiện tại (${L}m) ngắn hơn chiều dài kinh tế (${Math.round(L_kt)}m). Nếu mở hết van, vận tốc tự do sẽ vọt lên <b>${vFree.toFixed(2)} m/s</b>. Cần khống chế van/tiết lưu để giữ vận tốc thiết kế <b>${vKt.toFixed(2)} m/s</b>.</div>`;
+        } else {
+            box.style.backgroundColor = 'var(--warn-green-bg)';
+            box.style.borderColor = 'var(--warn-green-border)';
+            html += `<div class="alert-red">✅ <b>Đánh giá:</b> Tuyến ống dài ${L}m đáp ứng tốt thiết kế chạy theo vận tốc kinh tế tối ưu!</div>`;
+        }
+        box.innerHTML = html;
+        box.style.display = 'block';
     }
 
     function calcMode2() {
@@ -315,7 +317,25 @@
         document.getElementById('m2_res_lmax').innerText = Math.round(Lmax).toLocaleString('vi-VN') + " m";
 
         const rule = getEconVelocityRules(dMm);
-        renderWarningBox('m2_warn', vInput, rule, dMm, false);
+        const box = document.getElementById('m2_warn');
+        let html = `<div class="info-blue"><b>Cấp ống:</b> ${rule.grade} - ${rule.role} (DN${dMm})</div>`;
+        html += `<div class="info-blue"><b>Vận tốc kinh tế tiêu chuẩn (v<sub>kt</sub>):</b> ${rule.min} - ${rule.max} m/s</div>`;
+
+        if (vInput < rule.min) {
+            box.style.backgroundColor = 'var(--warn-yellow-bg)';
+            box.style.borderColor = 'var(--warn-yellow-border)';
+            html += `<div class="alert-red">⚠️ <b>Đánh giá:</b> Vận tốc chọn <b>${vInput.toFixed(2)} m/s</b> nhỏ hơn dải kinh tế.</div>`;
+        } else if (vInput > rule.max) {
+            box.style.backgroundColor = 'var(--warn-red-bg)';
+            box.style.borderColor = 'var(--warn-red-border)';
+            html += `<div class="alert-red">🚫 <b>Cảnh báo:</b> Vận tốc chọn <b>${vInput.toFixed(2)} m/s</b> vượt dải kinh tế.</div>`;
+        } else {
+            box.style.backgroundColor = 'var(--warn-green-bg)';
+            box.style.borderColor = 'var(--warn-green-border)';
+            html += `<div class="alert-red">✅ <b>Đánh giá:</b> Vận tốc chọn <b>${vInput.toFixed(2)} m/s</b> đạt chuẩn kinh tế tối ưu!</div>`;
+        }
+        box.innerHTML = html;
+        box.style.display = 'block';
     }
 
     window.onload = function() {
