@@ -87,11 +87,11 @@
             <div class="form-grid">
                 <div class="form-group">
                     <label>Áp lực đầu P<sub>1</sub> (bar):</label>
-                    <input type="number" id="m1_p1" value="3.0" step="0.1" inputmode="decimal" onchange="calcMode1()">
+                    <input type="number" id="m1_p1" value="3.0" step="0.1" inputmode="decimal" onfocus="this.select()" onchange="calcMode1()">
                 </div>
                 <div class="form-group">
                     <label>Áp lực cuối P<sub>2</sub> (bar):</label>
-                    <input type="number" id="m1_p2" value="2.0" step="0.1" inputmode="decimal" onchange="calcMode1()">
+                    <input type="number" id="m1_p2" value="2.0" step="0.1" inputmode="decimal" onfocus="this.select()" onchange="calcMode1()">
                 </div>
                 <div class="form-group">
                     <label>Vật liệu ống:</label>
@@ -110,7 +110,7 @@
                 </div>
                 <div class="form-group" style="grid-column: 1 / -1;">
                     <label>Chiều dài ống L (m):</label>
-                    <input type="number" id="m1_l" value="500" step="10" inputmode="decimal" onchange="calcMode1()">
+                    <input type="number" id="m1_l" value="500" step="10" inputmode="decimal" onfocus="this.select()" onchange="calcMode1()">
                 </div>
             </div>
 
@@ -135,11 +135,11 @@
             <div class="form-grid">
                 <div class="form-group">
                     <label>Áp lực đầu P<sub>1</sub> (bar):</label>
-                    <input type="number" id="m2_p1" value="3.0" step="0.1" inputmode="decimal" onchange="calcMode2()">
+                    <input type="number" id="m2_p1" value="3.0" step="0.1" inputmode="decimal" onfocus="this.select()" onchange="calcMode2()">
                 </div>
                 <div class="form-group">
                     <label>Áp lực cuối P<sub>2</sub> (bar):</label>
-                    <input type="number" id="m2_p2" value="2.0" step="0.1" inputmode="decimal" onchange="calcMode2()">
+                    <input type="number" id="m2_p2" value="2.0" step="0.1" inputmode="decimal" onfocus="this.select()" onchange="calcMode2()">
                 </div>
                 <div class="form-group">
                     <label>Vật liệu ống:</label>
@@ -158,11 +158,11 @@
                 </div>
                 <div class="form-group">
                     <label>Chiều dài ống L (m):</label>
-                    <input type="number" id="m2_l" value="500" step="10" inputmode="decimal" onchange="calcMode2()">
+                    <input type="number" id="m2_l" value="500" step="10" inputmode="decimal" onfocus="this.select()" onchange="calcMode2()">
                 </div>
                 <div class="form-group">
                     <label>Vận tốc chọn v (m/s):</label>
-                    <input type="number" id="m2_v" value="1.0" step="0.1" inputmode="decimal" oninput="calcMode2()">
+                    <input type="number" id="m2_v" value="1.0" step="0.1" inputmode="decimal" onfocus="this.select()" oninput="calcMode2()">
                 </div>
             </div>
 
@@ -243,11 +243,9 @@
     function renderWarningBox(boxId, vVal, rule, dMm, isTheory = false) {
         const box = document.getElementById(boxId);
 
-        // 2 dòng đầu màu Xanh Blue
         let html = `<div class="info-blue"><b>Cấp ống:</b> ${rule.grade} - ${rule.role} (DN${dMm})</div>`;
         html += `<div class="info-blue"><b>Vận tốc kinh tế tiêu chuẩn (v<sub>kt</sub>):</b> ${rule.min} - ${rule.max} m/s</div>`;
 
-        // Dòng cảnh báo bên dưới
         if (vVal < rule.min) {
             box.style.backgroundColor = 'var(--warn-yellow-bg)';
             box.style.borderColor = 'var(--warn-yellow-border)';
