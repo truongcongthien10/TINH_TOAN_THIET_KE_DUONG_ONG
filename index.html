@@ -23,11 +23,11 @@
         th, td { border: 1px solid #ddd; padding: 8px; text-align: center; font-size: 0.9rem; }
         th { background-color: #f2f2f2; }
         
-        /* CSS MỚI: Định dạng nổi bật cho các dòng đạt điều kiện */
+        /* Định dạng nổi bật cho các dòng đạt điều kiện */
         .row-success { 
-            background-color: #e8f5e9 !important; /* Nền xanh lá nhạt */
-            color: #1b5e20 !important;           /* Màu chữ xanh lá đậm */
-            font-weight: bold !important;        /* In đậm toàn bộ chữ trên hàng */
+            background-color: #e8f5e9 !important;
+            color: #1b5e20 !important;
+            font-weight: bold !important;
         }
         
         .text-danger { color: #d32f2f; font-weight: bold; }
@@ -81,8 +81,8 @@
                 <label for="c_val">Vật liệu ống (Hệ số C):</label>
                 <select id="c_val">
                     <option value="140">Ống nhựa HDPE / uPVC / PPR (C = 140)</option>
-                    <option value="130">Ống thép mới (C = 130)</option>
-                    <option value="100">Ống gang cũ (C = 100)</option>
+                    <option value="130">Ống gang mới / Ống thép mới (C = 130)</option>
+                    <option value="100">Ống gang cũ / Ống thép cũ (C = 100)</option>
                 </select>
             </div>
         </div>
@@ -111,7 +111,7 @@
 </div>
 
 <script>
-// Danh sách ống HDPE PN10 (SDR11)
+// Danh sách ống mẫu (Đã bỏ DN200, DN400, DN500)
 const pipeCatalog = [
     { dn: "DN250", din: 204.6 },
     { dn: "DN315", din: 257.8 },
@@ -178,7 +178,7 @@ function calculate() {
             
             if (v >= 0.6 && v <= 2.0 && i <= 5.0) {
                 status = "Đạt điều kiện";
-                rowClass = "row-success"; // Gán class tô đậm & màu nền cho cả hàng
+                rowClass = "row-success";
                 statusClass = "text-success";
                 if (!recommendedPipe || Math.abs(v - v_select) < Math.abs(calcV(Q, recommendedPipe.din) - v_select)) {
                     recommendedPipe = pipe;
@@ -229,7 +229,7 @@ function calculate() {
                 note = "Không đạt (Vận tốc quá cao > 2.0m/s)";
             } else {
                 note = "Đạt điều kiện";
-                rowClass = "row-success"; // Gán class tô đậm & màu nền cho cả hàng
+                rowClass = "row-success";
                 if (!optimalPipe) {
                     optimalPipe = pipe;
                 }
