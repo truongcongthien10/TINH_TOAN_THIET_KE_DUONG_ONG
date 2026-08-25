@@ -57,7 +57,7 @@
     <div class="header-bar">CÔNG CỤ TÍNH THỦY LỰC ĐƯỜNG ỐNG</div>
     
     <div class="tab-container">
-        <button class="tab-btn active" onclick="switchMode('mode1')">TH1: Tự tính V (Hiện trường)</button>
+        <button class="tab-btn active" onclick="switchMode('mode1')">TH1: Tự Tính V (Hiện trường)</button>
         <button class="tab-btn" onclick="switchMode('mode2')">TH2: Nhập V Cần tính toán (Thiết kế)</button>
     </div>
 
@@ -65,7 +65,7 @@
         <!-- TRƯỜNG HỢP 1 -->
         <div id="mode1">
             <div class="mode-desc">
-                📌 <b>Trường hợp 1:</b> Tự động tính ra <b>Vận tốc thực tế (v)</b> dựa trên độ sụt áp (P1 - P2) và chiều dài (L). Cảnh báo nếu vận tốc v > 2.0 m/s.
+                📌 <b>Trường hợp 1:</b> Tự động tính ra <b>Vận tốc thực tế ($v$)</b> dựa trên độ sụt áp ($P_1 - P_2$) và chiều dài ($L$). Cảnh báo nếu vận tốc $v > 1.7 \text{ m/s}$.
             </div>
             <div class="section-title">I. Thông Số Đầu Vào</div>
             <div class="form-grid">
@@ -108,14 +108,14 @@
                 <div class="result-item"><span class="result-label">Lưu lượng ngày đêm (Q<sub>ngđ</sub>):</span><span class="total-highlight" id="m1_res_qday">- m³/ngđ</span></div>
             </div>
             <div class="warning-box" id="m1_warn">
-                ⚠️ <b>Cảnh báo:</b> Vận tốc thực tế sinh ra đạt <b><span id="m1_v_val"></span> m/s</b> (> 2.0 m/s). Cần kiểm tra rủi ro xói mòn / búa nước trên tuyến.
+                ⚠️ <b>Cảnh báo:</b> Vận tốc thực tế sinh ra đạt <b><span id="m1_v_val"></span> m/s</b> (> 1.7 m/s). Cần kiểm tra rủi ro xói mòn / búa nước trên tuyến.
             </div>
         </div>
 
         <!-- TRƯỜNG HỢP 2 -->
         <div id="mode2" style="display: none;">
             <div class="mode-desc">
-                📌 <b>Trường hợp 2:</b> Nhập sẵn <b>Vận tốc đề xuất ($v \le 2.0 \text{ m/s}$)</b>. Hệ thống tính ngay Lưu lượng ($Q$) và Chiều dài ống tối đa ($L_{max}$) đạt vận tốc đó.
+                📌 <b>Trường hợp 2:</b> Nhập sẵn <b>Vận tốc đề xuất ($v \le 1.7 \text{ m/s}$)</b>. Hệ thống tính ngay Lưu lượng ($Q$) và Chiều dài ống tối đa ($L_{max}$) đạt vận tốc đó.
             </div>
             <div class="section-title">I. Thông Số Đầu Vào</div>
             <div class="form-grid">
@@ -147,8 +147,8 @@
                     <input type="number" id="m2_l" value="500" step="10" inputmode="decimal">
                 </div>
                 <div class="form-group">
-                    <label>Vận tốc chọn v (m/s) [≤ 2.0]:</label>
-                    <input type="number" id="m2_v" value="1.0" step="0.1" max="2.0" inputmode="decimal" oninput="limitV2()">
+                    <label>Vận tốc chọn v (m/s) [≤ 1.7]:</label>
+                    <input type="number" id="m2_v" value="1.0" step="0.1" max="1.7" inputmode="decimal" oninput="limitV2()">
                 </div>
             </div>
 
@@ -162,14 +162,14 @@
                 <div class="result-item"><span class="result-label">Chiều dài tối đa đạt v chọn (L<sub>max</sub>):</span><span class="total-highlight" id="m2_res_lmax">- m</span></div>
             </div>
             <div class="warning-box" id="m2_warn">
-                ⚠️ <b>Lưu ý:</b> Vận tốc tính toán (v_tt) = <span id="m2_vtheory"></span> (m/s) cao hơn vận tốc v đã chọn.
+                ⚠️ <b>Lưu ý:</b> Vận tốc tính toán ($v_{thực} = <span id="m2_vtheory"></span> \text{ m/s}$) cao hơn vận tốc $v$ đã chọn.
             </div>
         </div>
     </div>
 </div>
 
 <script>
-    // Danh mục đường kính chuẩn theo vật liệu (Đã loại bỏ 180, 200, 400, 500 khỏi HDPE)
+    // Danh mục đường kính chuẩn theo vật liệu
     const diameterOptions = {
         hdpe: [16, 20, 25, 32, 40, 50, 63, 75, 90, 110, 125, 140, 160, 225, 250, 280, 315, 355, 450, 560, 630, 710, 800, 900, 1000, 1200],
         pvc: [21, 27, 34, 42, 49, 60, 75, 90, 110, 140, 160, 200, 225, 250, 280, 315, 355, 400, 450, 500],
@@ -217,7 +217,7 @@
 
     function limitV2() {
         const vInput = document.getElementById('m2_v');
-        if (parseFloat(vInput.value) > 2.0) vInput.value = 2.0;
+        if (parseFloat(vInput.value) > 1.7) vInput.value = 1.7;
     }
 
     function calcMode1() {
@@ -242,7 +242,7 @@
         document.getElementById('m1_res_qh').innerText = (qM3s * 3600).toFixed(2) + " m³/h";
         document.getElementById('m1_res_qday').innerText = Math.round(qM3s * 86400).toLocaleString('vi-VN') + " m³/ngđ";
 
-        if (vReal > 2.0) {
+        if (vReal > 1.7) {
             document.getElementById('m1_v_val').innerText = vReal.toFixed(2);
             document.getElementById('m1_warn').style.display = 'block';
         } else {
@@ -260,7 +260,7 @@
         const matSelect = document.getElementById('m2_mat');
         const C = parseFloat(matSelect.options[matSelect.selectedIndex].getAttribute('data-c')) || 140;
 
-        if (vInput > 2.0) vInput = 2.0;
+        if (vInput > 1.7) vInput = 1.7;
         if (dMm <= 0 || L <= 0 || p1 < p2) return;
 
         const hf = ((p1 - p2) * 100000) / 9810.0;
