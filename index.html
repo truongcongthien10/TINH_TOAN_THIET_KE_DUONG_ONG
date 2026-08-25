@@ -22,9 +22,16 @@
         table { width: 100%; border-collapse: collapse; margin-top: 15px; }
         th, td { border: 1px solid #ddd; padding: 8px; text-align: center; font-size: 0.9rem; }
         th { background-color: #f2f2f2; }
-        .highlight { background-color: #d4edda; font-weight: bold; }
-        .text-danger { color: red; font-weight: bold; }
-        .text-success { color: green; font-weight: bold; }
+        
+        /* CSS MỚI: Định dạng nổi bật cho các dòng đạt điều kiện */
+        .row-success { 
+            background-color: #e8f5e9 !important; /* Nền xanh lá nhạt */
+            color: #1b5e20 !important;           /* Màu chữ xanh lá đậm */
+            font-weight: bold !important;        /* In đậm toàn bộ chữ trên hàng */
+        }
+        
+        .text-danger { color: #d32f2f; font-weight: bold; }
+        .text-success { color: #1b5e20; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -104,7 +111,7 @@
 </div>
 
 <script>
-// Danh sách ống HDPE PN10 (SDR11) - Đã bỏ DN200, DN400, DN500
+// Danh sách ống HDPE PN10 (SDR11)
 const pipeCatalog = [
     { dn: "DN250", din: 204.6 },
     { dn: "DN315", din: 257.8 },
@@ -127,14 +134,12 @@ function toggleInputs() {
     }
 }
 
-// Hàm tính tổn thất theo Hazen-Williams (Hf tính bằng m H2O)
 function calcHf(Q_m3h, Din_mm, L_m, C) {
     const Q_m3s = Q_m3h / 3600;
     const D_m = Din_mm / 1000;
     return 10.67 * L_m * Math.pow(Q_m3s, 1.852) * Math.pow(C, -1.852) * Math.pow(D_m, -4.87);
 }
 
-// Hàm tính vận tốc chảy v (m/s)
 function calcV(Q_m3h, Din_mm) {
     const Q_m3s = Q_m3h / 3600;
     const D_m = Din_mm / 1000;
@@ -153,7 +158,6 @@ function calculate() {
     tbody.innerHTML = "";
     
     if (method === "1") {
-        // CÁCH 1: Theo Vận tốc kinh tế chọn trước
         const v_select = parseFloat(document.getElementById("v_select").value);
         const Q_m3s = Q / 3600;
         const D_calc_mm = Math.sqrt((4 * Q_m3s) / (Math.PI * v_select)) * 1000;
@@ -169,18 +173,20 @@ function calculate() {
             const i = Hf / (L / 1000);
             
             let status = "Không đạt";
+            let rowClass = "";
             let statusClass = "text-danger";
             
             if (v >= 0.6 && v <= 2.0 && i <= 5.0) {
                 status = "Đạt điều kiện";
+                rowClass = "row-success"; // Gán class tô đậm & màu nền cho cả hàng
                 statusClass = "text-success";
                 if (!recommendedPipe || Math.abs(v - v_select) < Math.abs(calcV(Q, recommendedPipe.din) - v_select)) {
                     recommendedPipe = pipe;
                 }
             }
             
-            const row = `<tr>
-                <td><b>${pipe.dn}</b></td>
+            const row = `<tr class="${rowClass}">
+                <td>${pipe.dn}</td>
                 <td>${pipe.din}</td>
                 <td>${v.toFixed(2)}</td>
                 <td>${Hf.toFixed(2)}</td>
@@ -195,11 +201,10 @@ function calculate() {
              <p>Lựa chọn dựa trên vận tốc v ≈ ${v_select} m/s và tổn thất đơn vị i ≤ 5.0 m/km.</p>`;
              
     } else {
-        // CÁCH 2: Kiểm tra đồng thời chênh áp ΔP và v
         const p1 = parseFloat(document.getElementById("p1").value);
         const p2 = parseFloat(document.getElementById("p2").value);
         const deltaP_bar = p1 - p2;
-        const deltaP_m = deltaP_bar * 10.197; // Qui đổi bar sang m H2O
+        const deltaP_m = deltaP_bar * 10.197;
         const i_allow = deltaP_m / (L / 1000);
         
         document.getElementById("summary_output").innerHTML = 
@@ -219,19 +224,19 @@ function calculate() {
             if (Hf > deltaP_m) {
                 note = "Không đạt (Vượt quá ΔP cho phép)";
             } else if (v < 0.6) {
-                note = "Cảnh báo (Vận tốc quá nhỏ < 0.6m/s gây lắng cặn)";
+                note = "Cảnh báo (Vận tốc quá nhỏ < 0.6m/s)";
             } else if (v > 2.0) {
-                note = "Không đạt (Vận tốc quá cao > 2.0m/s gây xói mòn)";
+                note = "Không đạt (Vận tốc quá cao > 2.0m/s)";
             } else {
-                note = "Thỏa mãn ΔP & Vận tốc";
+                note = "Đạt điều kiện";
+                rowClass = "row-success"; // Gán class tô đậm & màu nền cho cả hàng
                 if (!optimalPipe) {
-                    optimalPipe = pipe; // Chọn cỡ ống nhỏ nhất đầu tiên thỏa mãn
-                    rowClass = "highlight";
+                    optimalPipe = pipe;
                 }
             }
             
             const row = `<tr class="${rowClass}">
-                <td><b>${pipe.dn}</b></td>
+                <td>${pipe.dn}</td>
                 <td>${pipe.din}</td>
                 <td>${v.toFixed(2)}</td>
                 <td>${Hf.toFixed(2)}</td>
@@ -247,7 +252,6 @@ function calculate() {
     }
 }
 
-// Khởi tạo trạng thái ban đầu
 toggleInputs();
 </script>
 
