@@ -104,14 +104,12 @@
 </div>
 
 <script>
-// Danh sách ống HDPE PN10 (SDR11) mẫu [DN, Din]
+// Danh sách ống HDPE PN10 (SDR11) - Đã bỏ DN200, DN400, DN500
 const pipeCatalog = [
     { dn: "DN250", din: 204.6 },
     { dn: "DN315", din: 257.8 },
     { dn: "DN355", din: 290.6 },
-    { dn: "DN400", din: 327.4 },
     { dn: "DN450", din: 368.2 },
-    { dn: "DN500", din: 409.2 },
     { dn: "DN560", din: 458.4 },
     { dn: "DN630", din: 515.6 },
     { dn: "DN710", din: 581.2 },
@@ -197,7 +195,7 @@ function calculate() {
              <p>Lựa chọn dựa trên vận tốc v ≈ ${v_select} m/s và tổn thất đơn vị i ≤ 5.0 m/km.</p>`;
              
     } else {
-        // CÁCH 2: Cập nhật mới - Kiểm tra đồng thời chênh áp ΔP và v
+        // CÁCH 2: Kiểm tra đồng thời chênh áp ΔP và v
         const p1 = parseFloat(document.getElementById("p1").value);
         const p2 = parseFloat(document.getElementById("p2").value);
         const deltaP_bar = p1 - p2;
