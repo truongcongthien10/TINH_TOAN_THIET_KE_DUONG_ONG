@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Công Cụ Tính Thủy Lực Đường Ống</title>
+    <title>Công Cụ Tính Thủy Lực Đường Ống - HueWACO</title>
     <style>
         :root {
             --excel-green: #107c41;
@@ -62,7 +62,6 @@
             border: 1px dashed #b5d8bd;
         }
 
-        /* NÚT TÍNH TOÁN VỚI HIỆU ỨNG 3D HOÀN CHỈNH */
         .btn-calc { 
             width: 100%; 
             background: linear-gradient(135deg, #107c41 0%, #0b592e 100%); 
@@ -125,7 +124,7 @@
 <body>
 
 <div class="container">
-    <div class="header-bar">CÔNG CỤ TÍNH THỦY LỰC ĐƯỜNG ỐNG</div>
+    <div class="header-bar">CÔNG CỤ TÍNH THỦY LỰC ĐƯỜNG ỐNG - HueWACO</div>
     
     <div class="tab-container">
         <button class="tab-btn active" onclick="switchMode('mode1')">TH1: Tự Tính V (Hiện trường)</button>
@@ -247,7 +246,6 @@
 </div>
 
 <script>
-    // Cơ sở dữ liệu thông số kỹ thuật đường ống chi tiết (DN, OD, Độ dày wall, Đường kính trong din)
     const PIPE_DATABASE = {
         hdpe: [
             { dn: 40, od: 40, wall: 2.4, din: 35.2 },
@@ -414,7 +412,6 @@
             dSelect.appendChild(opt);
         });
 
-        // Mặc định chọn ống vị trí vừa tầm trung
         if (list.length > 3) {
             dSelect.selectedIndex = 3;
         }
@@ -432,13 +429,47 @@
         if (mode === 'mode1') calcMode1(); else calcMode2();
     }
 
+    function resetMode1Results(warnText) {
+        document.getElementById('m1_res_hf').innerText = "- m";
+        document.getElementById('m1_res_v').innerText = "- m/s";
+        document.getElementById('m1_res_qh').innerText = "- m³/h";
+        document.getElementById('m1_res_qday').innerText = "- m³/ngđ";
+        
+        const box = document.getElementById('m1_warn');
+        if (warnText) {
+            box.style.backgroundColor = 'var(--warn-red-bg)';
+            box.style.borderColor = 'var(--warn-red-border)';
+            box.innerHTML = `<div class="alert-red">⚠️ <b>Cảnh báo:</b> ${warnText}</div>`;
+            box.style.display = 'block';
+        } else {
+            box.style.display = 'none';
+        }
+    }
+
+    function resetMode2Results(warnText) {
+        document.getElementById('m2_res_hf').innerText = "- m";
+        document.getElementById('m2_res_qh').innerText = "- m³/h";
+        document.getElementById('m2_res_qday').innerText = "- m³/ngđ";
+        document.getElementById('m2_res_lmax').innerText = "- m";
+        
+        const box = document.getElementById('m2_warn');
+        if (warnText) {
+            box.style.backgroundColor = 'var(--warn-red-bg)';
+            box.style.borderColor = 'var(--warn-red-border)';
+            box.innerHTML = `<div class="alert-red">⚠️ <b>Cảnh báo:</b> ${warnText}</div>`;
+            box.style.display = 'block';
+        } else {
+            box.style.display = 'none';
+        }
+    }
+
     function calcMode1() {
         const dSelect = document.getElementById('m1_d');
         if (!dSelect.options.length) return;
 
         const p1 = parseFloat(document.getElementById('m1_p1').value) || 0;
         const p2 = parseFloat(document.getElementById('m1_p2').value) || 0;
-        const dInMm = parseFloat(dSelect.value) || 0; // Lấy đường kính trong din
+        const dInMm = parseFloat(dSelect.value) || 0;
         const wallThickness = dSelect.options[dSelect.selectedIndex].getAttribute('data-wall');
         const dnVal = parseFloat(dSelect.options[dSelect.selectedIndex].getAttribute('data-dn')) || dInMm;
         const L = parseFloat(document.getElementById('m1_l').value) || 0;
@@ -446,17 +477,25 @@
         const matSelect = document.getElementById('m1_mat');
         const C = parseFloat(matSelect.options[matSelect.selectedIndex].getAttribute('data-c')) || 140;
 
-        // Cập nhật thông số phụ phía dưới ô chọn
         document.getElementById('m1_sub_din').innerText = dInMm.toFixed(1);
         document.getElementById('m1_sub_wall').innerText = wallThickness;
 
-        if (dInMm <= 0 || L <= 0 || p1 < p2) return;
+        // Xử lý điều kiện biên thủy lực chuẩn xác
+        if (dInMm <= 0 || L <= 0) {
+            resetMode1Results("Đường kính và chiều dài ống phải lớn hơn 0.");
+            return;
+        }
+
+        if (p1 <= p2) {
+            resetMode1Results("Áp lực đầu P₁ phải lớn hơn áp lực cuối P₂ để có dòng chảy.");
+            return;
+        }
 
         const hf = (p1 - p2) * 10.0; 
-        const dM = dInMm / 1000.0; // Đổi đường kính trong ra mét
+        const dM = dInMm / 1000.0;
         const area = (Math.PI * Math.pow(dM, 2)) / 4.0;
         
-        // Hazen-Williams tính theo d_trong
+        // Hazen-Williams hệ mét chuẩn SI gốc
         const qM3s = Math.pow((hf * Math.pow(C, 1.852) * Math.pow(dM, 4.87)) / (11.737 * L), 1 / 1.852);
         const vReal = qM3s / area;
 
@@ -494,7 +533,7 @@
 
         const p1 = parseFloat(document.getElementById('m2_p1').value) || 0;
         const p2 = parseFloat(document.getElementById('m2_p2').value) || 0;
-        const dInMm = parseFloat(dSelect.value) || 0; // Lấy đường kính trong din
+        const dInMm = parseFloat(dSelect.value) || 0;
         const wallThickness = dSelect.options[dSelect.selectedIndex].getAttribute('data-wall');
         const dnVal = parseFloat(dSelect.options[dSelect.selectedIndex].getAttribute('data-dn')) || dInMm;
         const L = parseFloat(document.getElementById('m2_l').value) || 0;
@@ -503,17 +542,25 @@
         const matSelect = document.getElementById('m2_mat');
         const C = parseFloat(matSelect.options[matSelect.selectedIndex].getAttribute('data-c')) || 140;
 
-        // Cập nhật thông số phụ phía dưới ô chọn
         document.getElementById('m2_sub_din').innerText = dInMm.toFixed(1);
         document.getElementById('m2_sub_wall').innerText = wallThickness;
 
-        if (dInMm <= 0 || L <= 0 || p1 < p2 || vInput <= 0) return;
+        if (dInMm <= 0 || L <= 0 || vInput <= 0) {
+            resetMode2Results("Đường kính, chiều dài và vận tốc chọn phải lớn hơn 0.");
+            return;
+        }
+
+        if (p1 <= p2) {
+            resetMode2Results("Áp lực đầu P₁ phải lớn hơn áp lực cuối P₂ để có dòng chảy.");
+            return;
+        }
 
         const hf = (p1 - p2) * 10.0;
-        const dM = dInMm / 1000.0; // Đổi đường kính trong ra mét
+        const dM = dInMm / 1000.0;
         const area = (Math.PI * Math.pow(dM, 2)) / 4.0;
         const qM3s = vInput * area;
 
+        // Suy ngược Lmax từ Hazen-Williams SI gốc
         const Lmax = (hf * Math.pow(C, 1.852) * Math.pow(dM, 4.87)) / (11.737 * Math.pow(qM3s, 1.852));
 
         document.getElementById('m2_res_hf').innerText = hf.toFixed(2) + " m";
